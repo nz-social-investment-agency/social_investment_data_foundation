@@ -1,4 +1,4 @@
-## Social Investment Data Foundation
+﻿## Social Investment Data Foundation
 
 ## Overview
 The Social Investment Data Foundation is a group of scripts and macros pulled together into a process-flow, with the purpose of creating an analysis-ready dataset very quickly with all the required variables. Given a SAS dataset consisting of individuals in the IDI and dates for each of these individuals, this process flow creates the following-
@@ -86,7 +86,7 @@ The necessary example scripts are contained in examples folder. There are four s
 
 ### Part B: Specify arguments
 1. Open `examples/si_control_example_pd.sas`. This is where you specify the arguments needed to build the social investment data foundation, or what variables you want to generate. Read the header to understand all the variables. Variables with data validation have their possible options specified in the curly brackets e.g. {True | False}.
-2. Scroll down to the datalines - you can easily spot them because they are yellow in SAS. The first column represents the variable name and the second column represents the variable value. Since this is an example the second column is already populated, so you don't need to change anything here. When you run the SI data foundation you will need to specify your own arguments.
+2. Scroll down to the datalines - you can easily spot them because they are yellow in SAS. The first column represents the variable name and the second column represents the variable value. Since this is an example the second column is already populated. You will need to find the dataline related to `si_proj_schema` and change it to point at your schema. When you run the SI data foundation you will need to specify all of the arguments.
 3. Hit run on this script so SAS can identify the variables you are after. It will generate a wide dataset containing each argument. The script also puts these arguments into global macro variables.
 
 ### Part C: Generate variables
@@ -165,3 +165,5 @@ Additional outcomes variables can be added to the `sasautos/si_get_outcomes_ext.
 A guide will be made available in due course. For now if you have any questions email
 
 info@siu.govt.nz
+
+Tracking number: SIU-2017-0159
