@@ -3,16 +3,16 @@
 
 ## Contents
 
-[Overview](#overview)
-[Dependencies](#dependencies)
-[How it works](#how-it-works)
-[Folder descriptions](#folder-descriptions)
-[Installation](#installation)
-[Instructions](#instructions)
-[Example](#example)
-[Running the SIDF code with your own population](#running-the-sidf-code-with-your-own-population)
-[Advanced users](#advanced-users)
-[Getting help](#getting-help)
+* [Overview](#overview)
+* [Dependencies](#dependencies)
+* [How it works](#how-it-works)
+* [Folder descriptions](#folder-descriptions)
+* [Installation](#installation)
+* [Instructions](#instructions)
+* [Example](#example)
+* [Running the SIDF code with your own population](#running-the-sidf-code-with-your-own-population)
+* [Advanced users](#advanced-users)
+* [Getting help](#getting-help) 
 
 ## Overview
 The Social Investment Data Foundation (SIDF) is a set of scripts and macros that are arranged in to a process-flow. The purpose of the SIDF is to quickly create an analysis-ready dataset with all the required variables. Given a SAS dataset consisting of individuals in the IDI and dates for each of these individuals, this process flow creates the following:
