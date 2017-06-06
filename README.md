@@ -1,12 +1,27 @@
 
 # Social Investment Data Foundation
 
+## Contents
+
+[Overview](#overview)
+[Dependencies](#dependencies)
+[How it works](#how-it-works)
+[Folder descriptions](#folder-descriptions)
+[Installation](#installation)
+[Instructions](#instructions)
+[Example](#example)
+[Running the SIDF code with your own population](#running-the-sidf-code-with-your-own-population)
+[Advanced users](#advanced-users)
+[Getting help](#getting-help)
+
 ## Overview
 The Social Investment Data Foundation (SIDF) is a set of scripts and macros that are arranged in to a process-flow. The purpose of the SIDF is to quickly create an analysis-ready dataset with all the required variables. Given a SAS dataset consisting of individuals in the IDI and dates for each of these individuals, this process flow creates the following:
 
 * A set of static and slow changing characteristics such as demographics for each individual (as on the 'as at' date for that individual).
 * A set of service metrics which are the summarised versions of the SIAL tables. For example: duration on benefit, total cost on benefit, number of times on benefit.
 * Outcome variables that involve complex logic that doesn't fit in to the above two examples. For example: the highest educational qualification as on the 'as at' date.
+
+[Back to top](#)
 
 ## Dependencies
 * It is necessary to have an IDI project if you wish to run the code. Visit the [Stats NZ website](http://www.stats.govt.nz/browse_for_stats/snapshots-of-nz/integrated-data-infrastructure.aspx) for more information.
@@ -24,6 +39,8 @@ The Social Investment Data Foundation (SIDF) is a set of scripts and macros that
 	* security
 * If there are specific schemas listed above that you don't have access to, the **SIAL** main script (after it finishes running) will give you a detailed report on which SIAL tables were not created and why. You can use the **SIDF** to create service metrics for only those **SIAL** tables that were created. If you attempt to run the **SIDF** to create a variable from the **SIAL** table that does not exist in your schema, the variables won't be created. You won't get an error, the variable just won't exist.
 
+[Back to top](#)
+
 ## How it works
 You are given the provision to generate a SAS dataset with individual IDs and a date for each individual. Once this dataset is supplied as an input to the subsequent code, the following steps are performed:
 
@@ -36,6 +53,8 @@ You are given the provision to generate a SAS dataset with individual IDs and a 
 * A set of outcome variables are also created. In the current version 1.0.0, there is only one outcome variable (highest qualification as on the given date), but there is provision for users to define their own outcome variables that plug into the code. You are invited to share the code for the outcome variables that you create and contribute to this repository so that others can reuse it.
 
 Refer to the User Guide (once it is available) for more information.
+
+[Back to top](#)
 
 ## Folder descriptions
 This repository contains all the code necessary to define a population, create characteristics and create service metrics. Code is also given to create an outcome variable (highest qualification) for use as an example of how the more complex variables are created and added to the main dataset.
@@ -56,6 +75,8 @@ This repository contains all the code necessary to define a population, create c
 
 Note `sasprogs` is the only folder with scripts you need to edit to create a data foundation, unless you want to make changes to any source code.
 
+[Back to top](#)
+
 ## Installation
 1. Ensure you have an IDI project so you can run the code.
 2. Confirm you have the SIAL tables in your schema. If you do not then you will have to download the [social investment analytical layer](https://github.com/nz-social-investment-unit/social_investment_analytical_layer) zip file from GitHub and follow the installation instructions in that repository first.
@@ -63,8 +84,12 @@ Note `sasprogs` is the only folder with scripts you need to edit to create a dat
 4. Email the zipped file(s) to access2microdata@stats.govt.nz and ask them to move it into your project folder.
 5. Unzip the files into your project.
 
+[Back to top](#)
+
 ## Instructions
 It is strongly recommended that first time users run the SIDF examples to become familiar with the SIDF framework first.
+
+[Back to top](#)
 
 ## Example
 This example involves running the SI data foundation with ~ top 10,000 SNZ_UIDs from the personal details table based on the first day of each person’s birthday month in 2014. It is approximately 10,000 because we confirm they are attached to the spine and that they have a birth month.
@@ -106,6 +131,8 @@ In future releases it is intended that an automated version will be made availab
 3. You are finished. Your Social Investment Data Foundation is ready to use.
 
 **End of example**
+
+[Back to top](#)
 
 ## Running the SIDF code with your own population
 This section repeats the steps from the example above, except the population is not defined for you. These instructions will help you create your own population.
@@ -153,6 +180,8 @@ In future releases it is intended that an automated version will be made availab
 3. Run the script that you just created and confirm that it runs without error.
 4. You are finished. Your Social Investment data foundation (an analysis ready dataset) is ready to use.
 
+[Back to top](#)
+
 ## Advanced users
 Advanced users who are interested in adding additional variables to the code can do so. The code is written in a way that helps you write your additions in an automated way.
 
@@ -160,6 +189,8 @@ You can change the scripts in the `sasautos` folder if you want to do this. The 
 
 * Additional characteristic variables can be added to the `sasautos/si_get_characteristics_ext.sas` script.
 * Additional outcomes variables can be added to the `sasautos/si_get_outcomes_ext.sas` script.
+
+[Back to top](#)
 
 ## Getting Help
 A guide will be made available in due course. For now if you have any questions email info@siu.govt.nz
