@@ -1,6 +1,8 @@
 
 # Social Investment Data Foundation
 
+[![GitHub version](https://badge.fury.io/gh/nz-social-investment-unit%2Fsocial_investment_data_foundation.svg)](https://badge.fury.io/gh/nz-social-investment-unit%2Fsocial_investment_data_foundation)
+
 ## Contents
 
 * [Overview](#overview)
