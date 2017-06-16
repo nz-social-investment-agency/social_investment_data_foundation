@@ -7,7 +7,7 @@ the specificed population
 INPUT:
 si_char_proj_schema = name of your schema used to retrieve data in the sandpit via explicit pass through
 si_char_table_in = input table with a list of ids and dates (must be in the sandpit and must not be 
-                   preceeded with a libname)
+preceeded with a libname)
 si_as_at_date = the date from which we will look backto get slowly changing variables such as region
 
 OUTPUT:
@@ -23,6 +23,7 @@ NOTES:
 Stress tested with 2.5 million ids run time 2.5 min
 
 HISTORY: 
+14 Jun 2017 EW bug fix 1 hash object fix
 24 Apr 2017 EW v1
 *********************************************************************************************************/
 %macro si_get_characteristics(si_char_proj_schema=, si_char_table_in=, 
@@ -37,6 +38,7 @@ HISTORY:
 	%put .........si_as_at_date: &si_as_at_date;
 	%put .....si_char_table_out: &si_char_table_out;
 	%put ********************************************************************;
+
 
 	/* ensure that the user has only specified a table name and not libname.dataset */
 	%if %scan(&si_char_table_in.,2,.) ~= %then
@@ -168,9 +170,10 @@ HISTORY:
 			select *
 				from connection to odbc(
 					select distinct
-						a.snz_uid
+						a.snz_uid 
 						,b.ant_region_code
 						,b.ant_ta_code
+						,b.ant_meshblock_code
 					from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a
 						inner join [IDI_Clean].[data].[address_notification] b  
 							on a.snz_uid = b.snz_uid and 
@@ -263,8 +266,8 @@ as snz_cen_ind
 	/* use of hash objects requires a table in work first */
 	%if %sysfunc(exist(work.&si_char_table_in.)) = 0 %then
 		%do;
-		%put NOTE: In si_get_characteristics - si_char_table_in needs to be in work to use the hash objects;
-		%put NOTE: writing a copy of si_char_table_in into the work area;
+			%put NOTE: In si_get_characteristics - si_char_table_in needs to be in work to use the hash objects;
+			%put NOTE: writing a copy of si_char_table_in into the work area;
 
 			proc sql;
 				connect to odbc (dsn=idi_clean_archive_srvprd);
@@ -273,10 +276,12 @@ as snz_cen_ind
 						from connection to odbc(
 							select *
 								from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.]);
-									quit;
+			quit;
+
 		%end;
 
 	/* create a single table with all the characteristics in an efficient manner */
+	
 	data &si_char_table_out. (drop = return_code:);
 		set &si_char_table_in.;
 
@@ -287,14 +292,15 @@ as snz_cen_ind
 					set work._temp_personal_detail;
 				declare hash hpd(dataset: 'work._temp_personal_detail');
 				hpd.defineKey('snz_uid');
-				hpd.defineData('snz_birth_year_nbr','snz_birth_month_nbr','as_at_age','snz_sex_code','snz_spine_ind');
+				hpd.defineData('snz_birth_year_nbr','snz_birth_month_nbr','as_at_age','snz_sex_code','snz_spine_ind', 'snz_person_ind');
 				hpd.defineDone();
 
 				if 0 then
 					set work._temp_source_ranked_ethnicity;
 				declare hash hsre(dataset: 'work._temp_source_ranked_ethnicity');
 				hsre.defineKey('snz_uid');
-				hsre.defineData('prioritised_eth');
+				hsre.defineData('snz_ethnicity_grp1_nbr', 'snz_ethnicity_grp2_nbr', 'snz_ethnicity_grp3_nbr', 
+                'snz_ethnicity_grp4_nbr', 'snz_ethnicity_grp5_nbr', 'snz_ethnicity_grp6_nbr', 'prioritised_eth');
 				hsre.defineDone();
 
 				if 0 then
@@ -322,7 +328,7 @@ as snz_cen_ind
 					set work._temp_address_notification;
 				declare hash han(dataset: 'work._temp_address_notification');
 				han.defineKey('snz_uid');
-				han.defineData('ant_region_code', 'ant_ta_code');
+				han.defineData('ant_region_code', 'ant_ta_code', 'ant_meshblock_code');
 				han.defineDone();
 
 				if 0 then
@@ -336,13 +342,38 @@ as snz_cen_ind
 				hsc.defineDone();
 			end;
 
+		/* if the keys are not found make sure you reset the values to missing */
 		return_code_pd = hpd.find();
+
+		if  return_code_pd ne 0 then
+			call missing(snz_birth_year_nbr, snz_birth_month_nbr, as_at_age, snz_sex_code
+			, snz_spine_ind);
 		return_code_sre = hsre.find();
+
+		if  return_code_sre ne 0 then
+			call missing(prioritised_eth);
 		return_code_hci1 = hci1.find();
+
+		if  return_code_hci1 ne 0 then
+			call missing(cen_ind_iwi1_code, iwi1_desc);
 		return_code_hci2 = hci2.find();
+
+		if  return_code_hci2 ne 0 then
+			call missing(cen_ind_iwi2_code, iwi2_desc);
 		return_code_hci3 = hci3.find();
+
+		if  return_code_hci3 ne 0 then
+			call missing(cen_ind_iwi3_code, iwi3_desc);
 		return_code_han = han.find();
+
+		if return_code_han ne 0 then
+			call missing(ant_region_code, ant_ta_code, ant_meshblock_code);
 		return_code_hsc = hsc.find();
+
+		if return_code_hsc ne 0 then
+			call missing(snz_ird_ind, snz_moe_ind, snz_dol_ind, 
+			snz_msd_ind, snz_jus_ind, snz_acc_ind, snz_moh_ind, snz_dia_ind, snz_cen_ind,
+			uid_miss_ind_cnt);
 	run;
 
 	/* clean up */

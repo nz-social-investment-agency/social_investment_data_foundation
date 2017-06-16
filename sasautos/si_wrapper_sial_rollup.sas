@@ -49,12 +49,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moe, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 		/* Fetch list of SIAL MOE tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moe, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for MOH SIAL Tables & Views */
@@ -64,12 +64,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moh, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-	
+		%let outmacrovar=;
 		/* Fetch list of SIAL MOH tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moh, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for MSD SIAL Tables & Views */
@@ -79,12 +79,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = msd, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-
+		%let outmacrovar=;
 		/* Fetch list of SIAL MSD tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = msd, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for MOJ SIAL Tables & Views */
@@ -94,12 +94,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moj, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-
+		%let outmacrovar=;
 		/* Fetch list of SIAL MOJ tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moj, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for Corrections SIAL Tables & Views */
@@ -109,12 +109,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = cor, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-
+		%let outmacrovar=;
 		/* Fetch list of SIAL COR tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = cor, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for ACC SIAL Tables & Views */
@@ -124,12 +124,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = acc, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-
+		%let outmacrovar=;
 		/* Fetch list of SIAL ACC tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = acc, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for IRD SIAL Tables & Views */
@@ -139,12 +139,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = ird, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-
+		%let outmacrovar=;
 		/* Fetch list of SIAL IRD tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = ird, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for Police SIAL Tables & Views */
@@ -154,12 +154,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = pol, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-		
+		%let outmacrovar=;
 		/* Fetch list of SIAL Police tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = pol, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for Police SIAL Tables & Views */
@@ -169,12 +169,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = hnz, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-		
+		%let outmacrovar=;
 		/* Fetch list of SIAL Police tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = hnz, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 
 	/* Enable rollup for Police SIAL Tables & Views */
@@ -184,12 +184,12 @@ HISTORY:
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = mix, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
-		
+		%let outmacrovar=;
 		/* Fetch list of SIAL Police tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = mix, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
-
+		%let outmacrovar=;
 	%end;
 	
 	/* Loop through SIAL table list with costs and create inflation/discounting-adjusted & period-level rolled up variables*/
