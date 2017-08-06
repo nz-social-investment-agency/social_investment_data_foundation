@@ -1,0 +1,3 @@
+[submodule "lib/social_investment_analytical_layer"]
+	path = lib/social_investment_analytical_layer
+	url = https://github.com/nz-social-investment-agency/social_investment_analytical_layer
