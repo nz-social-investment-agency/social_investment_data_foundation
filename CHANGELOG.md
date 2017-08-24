@@ -17,3 +17,7 @@ v1
 * Issue #4 regarding hard coding of schemas is fixed
 
 
+## [1.1.1] - Aug 2017
+* SIAL submodule has been updated and pulled down to SIDF
+
+
