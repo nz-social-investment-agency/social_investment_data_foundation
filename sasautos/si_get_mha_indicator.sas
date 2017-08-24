@@ -38,6 +38,19 @@ HISTORY:
 *********************************************************************************************************/
 
 %macro si_get_mha_indicator(si_proj_schema=, si_table_in=, si_id_col = snz_uid, si_as_at_date = , si_out_table= );
+	%put ********************************************************************;
+	%put --------------------------------------------------------------------;
+	%put ----------------------SI Data Foundation----------------------------;
+	%put ............si_runtime: %sysfunc(datetime(), datetime20.);
+	%put --------------------------------------------------------------------;
+	%put -------si_get_mha_indicator: Inputs-----------------------;
+	%put ............si_proj_schema: &si_proj_schema;
+	%put ...............si_table_in: &si_table_in;
+	%put .................si_id_col: &si_id_col;
+	%put .............si_as_at_date: &si_as_at_date;
+	%put ..............si_out_table: &si_out_table;
+	%put --------------------------------------------------------------------;
+	%put ********************************************************************;
 
 	proc sql;
 
@@ -78,4 +91,3 @@ HISTORY:
 
 %mend;
 
-/*%si_get_mha_indicator(si_proj_schema=[DL-MAA2016-15], si_table_in=respop_2013_char_ext, si_id_col = snz_uid, si_as_at_date = as_at_date, si_out_table= si_mha_outcomes);*/

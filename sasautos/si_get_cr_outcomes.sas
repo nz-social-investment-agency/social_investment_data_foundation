@@ -50,7 +50,6 @@ HISTORY:
 	%put --------------------------------------------------------------------;
 	%put ********************************************************************;
 
-	/*	options mlogic mprint; */
 	/*	options sastrace=',,,d' sastraceloc=saslog nostsuffix; */
 	proc sql;
 		connect to odbc(dsn=idi_clean_archive_srvprd);
@@ -83,7 +82,3 @@ HISTORY:
 	quit;
 
 %mend;
-
-/* test */
-%si_get_cr_outcomes( si_crd_dsn = IDI_Clean, si_crd_proj_schema = DL-MAA2016-15, si_crd_table_in = si_pd_cohort, 
-	si_crd_id_col = snz_uid, si_crd_asat_date = as_at_date, si_crd_table_out = work.crd_indicators);

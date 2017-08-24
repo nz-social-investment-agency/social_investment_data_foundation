@@ -31,7 +31,7 @@ HISTORY:
 15 May 2017 VB v1
 *******************************************************************************************************/
 
-%macro si_wrapper_sial_rollup();
+%macro si_wrapper_sial_rollup(si_wrapper_proj_schema=);
 
 	%put ********************************************************************;
 	%put --------------------------------------------------------------------;
@@ -46,12 +46,12 @@ HISTORY:
 	%if &si_use_moe. eq True %then %do;
 		
 		/* Fetch list of SIAL MOE tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moe, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moe, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
 		/* Fetch list of SIAL MOE tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moe, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moe, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -61,12 +61,12 @@ HISTORY:
 	%if &si_use_moh. eq True %then %do;
 	
 		/* Fetch list of SIAL MOH tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moh, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moh, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL MOH tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moh, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moh, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -76,12 +76,12 @@ HISTORY:
 	%if &si_use_msd. eq True %then %do;
 		
 		/* Fetch list of SIAL MSD tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = msd, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = msd, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL MSD tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = msd, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = msd, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -91,12 +91,12 @@ HISTORY:
 	%if &si_use_moj. eq True %then %do;
 		
 		/* Fetch list of SIAL MOJ tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moj, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moj, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL MOJ tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moj, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moj, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -106,12 +106,12 @@ HISTORY:
 	%if &si_use_cor. eq True %then %do;
 		
 		/* Fetch list of SIAL COR tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = cor, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = cor, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL COR tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = cor, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = cor, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -121,12 +121,12 @@ HISTORY:
 	%if &si_use_acc. eq True %then %do;
 	
 		/* Fetch list of SIAL ACC tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = acc, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = acc, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL ACC tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = acc, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = acc, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -136,12 +136,12 @@ HISTORY:
 	%if &si_use_ird. eq True %then %do;
 
 		/* Fetch list of SIAL IRD tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = ird, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = ird, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL IRD tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = ird, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = ird, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -151,12 +151,12 @@ HISTORY:
 	%if &si_use_pol. eq True %then %do;
 		
 		/* Fetch list of SIAL Police tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = pol, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = pol, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL Police tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = pol, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = pol, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -166,12 +166,12 @@ HISTORY:
 	%if &si_use_hnz. eq True %then %do;
 		
 		/* Fetch list of SIAL Police tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = hnz, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = hnz, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL Police tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = hnz, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = hnz, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -181,12 +181,12 @@ HISTORY:
 	%if &si_use_mix. eq True %then %do;
 		
 		/* Fetch list of SIAL Police tables with costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = mix, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = mix, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
 		/* Fetch list of SIAL Police tables without costs*/
-		%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = mix, 
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = mix, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;

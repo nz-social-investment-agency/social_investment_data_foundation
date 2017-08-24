@@ -1,1 +1,1 @@
-Delete me
+Currently only the readme and inline documentation are available.

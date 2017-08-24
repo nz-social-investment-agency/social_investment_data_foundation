@@ -41,14 +41,12 @@ HISTORY:
 	%put INFO: extra code could filter the rows eg those with a spine ind of 1;
 
 	/* example of an extension */
-	/* we prefer to use those linked to the spine because the spine is the dataset that allows */
-	/* us to link to all the other datasets in the IDI if someone isnt attached to the spine */
-	/* we might make incorrect inferences about the population */
 	proc sql;
-		create table &si_char_ext_table_out. as
-			select *
-		from &si_char_ext_table_in.
-			where snz_spine_ind = 1;
+	create table &si_char_ext_table_out. as
+		select *
+			from &si_char_ext_table_in.
+			/*where snz_spine)ind = 1*/
+    ;
 	quit;
 
 %mend si_get_characteristics_ext;

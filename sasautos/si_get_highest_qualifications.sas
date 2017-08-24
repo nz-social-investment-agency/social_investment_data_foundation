@@ -557,7 +557,7 @@ HISTORY:
 				where a.snz_uid not in (select snz_uid from &si_out_table.);
 	quit;
 
-	data &si_out_table.;
+	data &si_out_table._1;
 		set &si_out_table. cen_qual (keep=snz_uid cen_ind_std_highest_qual nqflevel);
 
 		if qualification="" then
@@ -569,6 +569,17 @@ HISTORY:
 		else qual_from_census=0;
 		drop cen_ind_std_highest_qual;
 	run;
+/* to get the consistent qualification level from either datesets */
+			proc sql;
+			create table &si_out_table. as
+				select  snz_uid,attainedsd,nqflevel, 
+					put(put(nqflevel, z2.), $highest_qual.) as highest_qual_moe_cen
+
+				from &si_out_table._1
+			;
+		quit;
+
+run;
 
 	** house keeping **;
 	proc datasets lib = work nolist;
@@ -582,6 +593,7 @@ HISTORY:
 			moe_ito_programme_lookup_table:
 			census_qual:
 			cen_qual:
+			&si_out_table._1:
 		;
 	run;
 

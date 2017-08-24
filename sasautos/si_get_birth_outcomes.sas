@@ -8,7 +8,7 @@ si_bir_proj_schema = Project schema used to find your tables in the sandpit
 si_bir_table_in = name of the input table
 si_bir_id_col = id column used for joining tables {default = snz_uid}
 si_bir_asat_date = name of the column containing a datetime field used to identify outcomes in a 
-    specified time period
+specified time period
 
 OUTPUT:
 si_bir_table_out = name of the output table containing the indicators age_at_first_birth and
@@ -42,20 +42,19 @@ HISTORY:
 	%put ......si_bir_table_out: &si_bir_table_out;
 	%put --------------------------------------------------------------------;
 	%put ********************************************************************;
-/*	options mlogic mprint;*/
-/*	options sastrace=',,,d' sastraceloc=saslog nostsuffix;*/
 
 	proc sql;
 		connect to odbc(dsn=idi_clean_archive_srvprd);
 		create table &si_bir_table_out. as 
 			select * from connection to odbc(
 			select a.&si_bir_id_col.
-		      	, b.num_children
-				, datediff(yyyy, datefromparts(c.snz_birth_year_nbr , c.snz_birth_month_nbr, 15), b.date_of_first_birth ) as age_at_first_birth
+				, b.num_children
+				, datediff(yyyy, datefromparts(c.snz_birth_year_nbr , c.snz_birth_month_nbr, 15), b.date_of_first_birth ) as
+				age_at_first_birth
 				, 
 			case 
-			/* Stats NZ statistics noted the youngest parents were 11 so this is treated as the lower bound of teen birth 
-			   anything younger is assumed to be a linking error */
+				/* Stats NZ statistics noted the youngest parents were 11 so this is treated as the lower bound of teen birth 
+				anything younger is assumed to be a linking error */
 				when datediff(yyyy, datefromparts(c.snz_birth_year_nbr , c.snz_birth_month_nbr, 15), b.date_of_first_birth ) 
 				between 11 and 19 then 1 
 			end 
@@ -90,7 +89,3 @@ HISTORY:
 						);
 		disconnect from odbc;
 %mend;
-
-/* test */
-%si_get_birth_outcomes( si_bir_dsn = IDI_Clean, si_bir_proj_schema = DL-MAA2016-15, si_bir_table_in = si_pd_cohort, 
-	si_bir_id_col = snz_uid, si_bir_asat_date = as_at_date, si_bir_table_out = work.birth_indicators);

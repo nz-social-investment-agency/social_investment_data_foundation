@@ -41,8 +41,25 @@ HISTORY:
 26 Jun 2017		Vinay Benny		v1 
 *********************************************************************************************************/
 
-%macro si_get_freq_address_changes(si_idiclean_version=, si_proj_schema=, si_table_in=, si_id_col = snz_uid, si_as_at_date = , 
-	si_nbr_address_changes= , si_nbr_periods= , si_out_table= );
+%macro si_get_freq_address_changes(si_idiclean_version=, si_proj_schema=, si_table_in=, si_id_col = snz_uid,
+si_as_at_date = , si_nbr_address_changes= , si_nbr_periods= , si_out_table= );
+
+	%put ********************************************************************;
+	%put --------------------------------------------------------------------;
+	%put ----------------------SI Data Foundation----------------------------;
+	%put ............si_runtime: %sysfunc(datetime(), datetime20.);
+	%put --------------------------------------------------------------------;
+	%put si_get_socialhousing_indicator: Inputs-----------------------;
+	%put .......si_idiclean_version: &si_idiclean_version;
+	%put ............si_proj_schema: &si_proj_schema;
+	%put ...............si_table_in: &si_table_in;
+	%put .................si_id_col: &si_id_col;
+	%put .............si_as_at_date: &si_as_at_date;
+	%put ....si_nbr_address_changes: &si_nbr_address_changes;
+    %put ............si_nbr_periods: &si_nbr_periods;
+	%put ..............si_out_table: &si_out_table;
+	%put --------------------------------------------------------------------;
+	%put ********************************************************************;
 
 	proc sql;
 
@@ -64,6 +81,3 @@ HISTORY:
 	quit;
 
 %mend;
-
-/*%si_get_freq_address_changes(si_idiclean_version = IDI_Clean , si_proj_schema = [DL-MAA2016-15], si_table_in = respop_2013_char_ext, 
-si_id_col = snz_uid, si_as_at_date = as_at_date , si_nbr_address_changes= 5, si_nbr_periods= 3, si_out_table= addrchange_ind ) */

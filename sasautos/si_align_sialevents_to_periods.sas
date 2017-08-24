@@ -273,7 +273,7 @@ HISTORY:
 
 		/* Temporarily store the event start & end dates */
 		event_sdate = start_date;
-		event_edate = end_date;		
+		event_edate = min(end_date, datetime() );		
 		start_date = .;
 		end_date = .;
 		full_amount = &si_amount_col. ;

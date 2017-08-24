@@ -28,14 +28,14 @@ macro variable that can be used for filtering
 HISTORY: 
 19 Jun 2017 EW v1
 *********************************************************************************************************/
-%macro si_get_te_reo(si_reo_dsn = IDI_Clean, si_reo_proj_schema, si_reo_table_in =  =, si_reo_id_col = , 
-si_reo_asat_date=, si_reo_table_out =);
+%macro si_get_te_reo(si_reo_dsn = IDI_Clean, si_reo_proj_schema =, si_reo_table_in =, si_reo_id_col =, 
+si_reo_asat_date =, si_reo_table_out =);
 	%put ********************************************************************;
 	%put --------------------------------------------------------------------;
 	%put ----------------------SI Data Foundation----------------------------;
 	%put ............si_runtime: %sysfunc(datetime(), datetime20.);
 	%put --------------------------------------------------------------------;
-	%put -------------si_get_te_reo_participation: Inputs--------------------;
+	%put ---------------si_get_te_reo: Inputs----------------------;
 	%put ............si_reo_dsn: &si_reo_dsn;
 	%put ....si_reo_proj_schema: &si_reo_proj_schema.;
 	%put .......si_ece_table_in: &si_reo_table_in;
@@ -64,10 +64,6 @@ si_reo_asat_date=, si_reo_table_out =);
 	quit;
 
 %mend;
-
-/* test */
-%si_get_te_reo(si_reo_proj_schema = DL-MAA2016-15, si_reo_table_in = si_pd_cohort,  
-si_reo_id_col = snz_uid, si_reo_table_out = si_pd_reo_indicator);
 
 
 

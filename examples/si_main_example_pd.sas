@@ -95,7 +95,7 @@ options obs=MAX mvarsize=max pagesize=132
 /* obtain the SIAL related events and costs within the observation horizon for the population table */
 /* apply inflation adjustments to costs if required. The SIAL tables that will be rolled up depends on */
 /* the configuration in the si_control.sas */
-%si_wrapper_sial_rollup;
+%si_wrapper_sial_rollup(si_wrapper_proj_schema=&si_proj_schema.);
 
 /* this section calls all the outcome variables - users can add extra macro calls in here for their own */
 /* customised outcome variables */
