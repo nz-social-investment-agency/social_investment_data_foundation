@@ -21,6 +21,8 @@ INPUT:
 	si_as_at_date = sial profile ending date/date column we  are interested in to find highest qualification
 
 	si_idi_refresh_date: idi extract date, leave null for the current extract
+    
+	si_target_schema: This is your schema on the SQL server (eg DL-MAA2016-XX)
 
 	si_out_table: output dataset with qualifcations gained ;
 
@@ -32,6 +34,7 @@ provide the required parameters to the macro call and excute it:
 								,si_id_col = sial identification column/idi subsetting variable in the idi source table [sidid_ididataset], eg si_id_col = snz_uid 
 								,si_as_at_date = sail profile ending date/any date column we  are interested in to find highest qualification
 								,si_idi_refresh_date = [idi refresh date, leave null for the current refresh](eg 20161020)
+								,si_target_schema= This is your schema on the SQL server (eg DL-MAA2016-XX)
 								,si_out_table = [output dataset with qualifcations gained]
 								);
 
@@ -75,7 +78,8 @@ HISTORY:
 %MACRO si_get_highest_qualifications( si_table_in =
                                   ,si_id_col = 
     							  ,si_as_at_date =  
- 								  ,si_IDI_refresh_date =  
+ 								  ,si_IDI_refresh_date =
+								  ,si_target_schema=
                                   ,si_out_table =
                                   ) ;
 
@@ -158,6 +162,7 @@ HISTORY:
 	** 1.1 subset moe school qualifcations table to ids of interest *;
 	%si_subset_idi_dataset ( sidid_infile = &si_table_in
 										,sidid_id_var = &si_id_col
+										,sidid_targetschema=&si_target_schema
 										,sidid_ason_var = &si_as_at_date
 										,sidid_idiextdt = &si_idi_refresh_date
 										,sidid_ididataset = moe_clean.student_qualification
@@ -310,6 +315,7 @@ HISTORY:
 /*	** 2.1 subset moe tertiary qualifcations table to ids of interest **/
 	%si_subset_idi_dataset( sidid_infile = &si_table_in
 						,sidid_id_var = &si_id_col
+						,sidid_targetschema=&si_target_schema
 						,sidid_ason_var = &si_as_at_date
 						,sidid_idiextdt = &si_idi_refresh_date
 						,sidid_ididataset = moe_clean.completion
@@ -416,6 +422,7 @@ HISTORY:
 /*** 3.1 subset moe industry training organisation table to ids of interest **/
 	%si_subset_idi_dataset( sidid_infile = &si_table_in
 		,sidid_id_var = &si_id_col
+		,sidid_targetschema=&si_target_schema
 		,sidid_ason_var = &si_as_at_date
 		,sidid_idiextdt = &si_idi_refresh_date
 		,sidid_ididataset = moe_clean.tec_it_learner
@@ -540,6 +547,7 @@ HISTORY:
 	** 4.1 subset census 2013 table to ids of interest *;
 	%si_subset_idi_dataset_census( sidid_infile = &si_table_in
 		,sidid_id_var = &si_id_col
+		,sidid_targetschema=&si_target_schema
 		,sidid_ason_var = as_at_age
 		,sidid_idiextdt = &si_idi_refresh_date
 		,sidid_ididataset = idi_clean.cen_clean.census_individual
@@ -606,5 +614,6 @@ run;
 /*	,si_id_col = snz_uid*/
 /*    ,si_as_at_date = sofie_interview_date */
 /* 	,si_idi_refresh_date = */
+/*	,si_target_schema=*/
 /*  	,si_out_table = sial_qualifications*/
 /*   	) ;*/

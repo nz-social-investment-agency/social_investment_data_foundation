@@ -65,6 +65,7 @@ HISTORY:
 			,sidid_ididataset =
 			,sidid_ididataset_com_var = 
 			,sidioutfile =
+			,sidid_targetschema=
 			,sidisandpit =
 			);
 	
@@ -108,7 +109,7 @@ HISTORY:
 		create table sidi_temp5 as
 			select a.*
 				from connection to sqlservr (select t1.* from &sidid_ididataset. t1
-					inner join [idi_sandpit].[dl-maa2016-15].&sidid_infile. t2 
+					inner join [idi_sandpit].[&sidid_targetschema].&sidid_infile. t2 
 						on t1.snz_uid = t2.&sidid_id_var
 					where cast(left(cast(t1.&sidid_ididataset_com_var. as varchar(8)),4) as int) <= year(t2.&sidid_ason_var.)
 						) as a;

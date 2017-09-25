@@ -56,6 +56,7 @@ HISTORY:
 			,sidid_idiextdt = 
 			,sidid_ididataset =
 			,sidioutfile =
+			,sidid_targetschema=
 			,sidisandpit =
 			);
 	
@@ -103,7 +104,7 @@ HISTORY:
 					cen_ind_post_scl_level_code,
 					cen_ind_std_highest_qual_code 
 				from &sidid_ididataset. t1
-					inner join [idi_sandpit].[dl-maa2016-15].&sidid_infile. t2 
+					inner join [idi_sandpit].[&sidid_targetschema].&sidid_infile. t2 
 						on t1.snz_uid = t2.&sidid_id_var
 					where  t2.&sidid_ason_var. >= 18 
 						) as a;
