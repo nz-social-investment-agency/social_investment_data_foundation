@@ -42,6 +42,7 @@ HISTORY:
 		,si_id_col = &si_id_col.
 		,si_as_at_date = &si_asat_date. 
 		,si_IDI_refresh_date = 
+		,si_target_schema = &si_proj_schema.
 		,si_out_table = SIAL_Qualifications
 		);
 
