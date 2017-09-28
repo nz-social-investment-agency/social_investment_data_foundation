@@ -37,7 +37,7 @@ HISTORY:
 /*options mlogic mprint;*/
 /* user specified input  in the main script */
 /* location where the folders are stored */
-%let si_source_path = \\wprdfs08\MAA2016-15 Supporting the Social Investment Unit\si_data_foundation;
+%let si_source_path = \\wprdfs08\MAA2016-15 Supporting the Social Investment Unit\social_investment_data_foundation;
 
 /*********************************************************************************************************/
 /* time the run to help plan for future re-runs if necessary */
