@@ -6,6 +6,8 @@
 ## Contents
 
 * [Overview](#overview)
+* [License - content](#license-for-social-investment-data-foundation-content)
+* [License - code base](#license-for-social-investment-data-foundation-code-base)
 * [Dependencies](#dependencies)
 * [How it works](#how-it-works)
 * [Folder descriptions](#folder-descriptions)
@@ -22,6 +24,26 @@ The Social Investment Data Foundation (SIDF) is a set of scripts and macros that
 * A set of static and slow changing characteristics such as demographics for each individual (as on the 'as at' date for that individual).
 * A set of service metrics which are the summarised versions of the SIAL tables. For example: duration on benefit, total cost on benefit, number of times on benefit.
 * Outcome variables that involve complex logic that doesn't fit in to the above two examples. For example: the highest educational qualification as on the 'as at' date.
+
+[Back to top](#)
+
+## License for Social Investment Data Foundation Content
+[![License: CC BY SA 4.0](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-sa/4.0/)
+
+Crown copyright ©. This copyright work is licensed under the Creative Commons Attribution 4.0 International licence. In essence, you are free to copy, distribute and adapt the work, as long as you attribute the work to the New Zealand Government and abide by the other licence terms. 
+
+To view a copy of this licence, visit [https://creativecommons.org/licenses/by-sa/4.0/](https://creativecommons.org/licenses/by-sa/4.0/). 
+
+Please note that neither the New Zealand Government emblem nor the New Zealand Government logo may be used in any way which infringes any provision of the [Flags, Emblems, and Names Protection Act 1981](http://www.legislation.govt.nz/act/public/1981/0047/latest/whole.html) or would infringe such provision if the relevant use occurred within New Zealand. Attribution to the New Zealand Government should be in written form and not by reproduction of any emblem or the New Zealand Government logo.
+
+[Back to top](#)
+
+## License for Social Investment Data Foundation Code Base
+GNU GPLv3 License
+
+Crown copyright (c) 2017, Social Investment Agency on behalf of the New Zealand Government.
+
+See ![LICENSE.md](https://github.com/nz-social-investment-agency/social_investment_data_foundation/blob/master/LICENSE) for more details.
 
 [Back to top](#)
 
