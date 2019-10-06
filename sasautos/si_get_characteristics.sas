@@ -25,6 +25,8 @@ Stress tested with 2.5 million ids run time 2.5 min
 HISTORY: 
 14 Jun 2017 EW bug fix 1 hash object fix
 24 Apr 2017 EW v1
+April 2019 - SAS GRID changes. PNH. 
+APRIl 2019 - Source ranked ethnicity now part of personal details table
 *********************************************************************************************************/
 %macro si_get_characteristics(si_char_proj_schema=, si_char_table_in=, 
 			si_as_at_date=, si_char_table_out=);
@@ -49,7 +51,7 @@ HISTORY:
 
 	/* extract static characteristics that can be used for descriptive stats */
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_personal_detail as 
 			select *
 				from connection to odbc(
@@ -66,16 +68,18 @@ HISTORY:
 						,b.snz_sex_code
 						,b.snz_spine_ind 
 						,b.snz_person_ind
+
 					from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a 
-						inner join [IDI_Clean].[data].[personal_detail] b
+						inner join [&si_idi_clean_version.].[data].[personal_detail] b
 							on a.snz_uid=b.snz_uid
 							/* now done in the extension */
 							/*where b.snz_spine_ind = 1 and snz_person_ind = 1*/);
 	quit;
 
 	/* obtain the prioritised ethnictiy and the individual ethnicities*/
+	/* april 2019 - ethnicity now moved to the personal details table */
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_source_ranked_ethnicity as
 			select *
 				from connection to odbc(
@@ -99,7 +103,7 @@ HISTORY:
 					end 
 				as prioritised_eth
 					from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a
-						inner join [IDI_Clean].[data].[source_ranked_ethnicity] b
+						inner join [&si_idi_clean_version.].[data].[personal_detail] b
 							on a.snz_uid=b.snz_uid
 							);
 	quit;
@@ -107,7 +111,7 @@ HISTORY:
 	/* the most comprehensive source of iwi is from the census */
 	/* grab the first three iwi specified */
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_census_iwi1 as
 			select *
 				from connection to odbc(
@@ -117,7 +121,7 @@ HISTORY:
 						,c.descriptor_text as iwi1_desc
 
 					from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a
-						inner join [IDI_Clean].[cen_clean].[census_individual] b  
+						inner join [&si_idi_clean_version.].[cen_clean].[census_individual] b  
 							on a.snz_uid = b.snz_uid 
 						inner join [IDI_Metadata].[clean_read_CLASSIFICATIONS].[CEN_IWI] c 
 							on b.cen_ind_iwi1_code = c.cat_code
@@ -126,7 +130,7 @@ HISTORY:
 	quit;
 
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_census_iwi2 as
 			select *
 				from connection to odbc(
@@ -136,7 +140,7 @@ HISTORY:
 						,c.descriptor_text as iwi2_desc
 
 					from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a
-						inner join [IDI_Clean].[cen_clean].[census_individual] b  
+						inner join [&si_idi_clean_version.].[cen_clean].[census_individual] b  
 							on a.snz_uid = b.snz_uid 
 						inner join [IDI_Metadata].[clean_read_CLASSIFICATIONS].[CEN_IWI] c 
 							on b.cen_ind_iwi2_code = c.cat_code
@@ -145,7 +149,7 @@ HISTORY:
 	quit;
 
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_census_iwi3 as
 			select *
 				from connection to odbc(
@@ -155,7 +159,7 @@ HISTORY:
 						,c.descriptor_text as iwi3_desc
 
 					from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a
-						inner join [IDI_Clean].[cen_clean].[census_individual] b  
+						inner join [&si_idi_clean_version.].[cen_clean].[census_individual] b  
 							on a.snz_uid = b.snz_uid 
 						inner join [IDI_Metadata].[clean_read_CLASSIFICATIONS].[CEN_IWI] c 
 							on b.cen_ind_iwi3_code = c.cat_code
@@ -165,7 +169,7 @@ HISTORY:
 
 	/* region */
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_address_notification as
 			select *
 				from connection to odbc(
@@ -175,7 +179,7 @@ HISTORY:
 						,b.ant_ta_code
 						,b.ant_meshblock_code
 					from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a
-						inner join [IDI_Clean].[data].[address_notification] b  
+						inner join [&si_idi_clean_version.].[data].[address_notification] b  
 							on a.snz_uid = b.snz_uid and 
 							a.&si_as_at_date between b.ant_notification_date and b.ant_replacement_date);
 	quit;
@@ -183,7 +187,7 @@ HISTORY:
 	/* flags of other ids */
 	/* some projects may like to restrict their cohorts to those who have a particular agency id */
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_security_concordance as
 			select snz_uid
 				, 
@@ -259,7 +263,7 @@ as snz_cen_ind
 				,b.[snz_dia_uid]
 				,b.[snz_cen_uid]
 				from [IDI_Sandpit].[&si_char_proj_schema.].[&si_char_table_in.] a
-					inner join [IDI_Clean].[security].[concordance] b  
+					inner join [&si_idi_clean_version.].[security].[concordance] b  
 						on a.snz_uid = b.snz_uid);
 	quit;
 
@@ -270,7 +274,7 @@ as snz_cen_ind
 			%put NOTE: writing a copy of si_char_table_in into the work area;
 
 			proc sql;
-				connect to odbc (dsn=idi_clean_archive_srvprd);
+				connect to odbc (dsn=&si_idi_dsnname.);
 				create table work.&si_char_table_in. as
 					select *
 						from connection to odbc(

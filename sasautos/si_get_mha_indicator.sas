@@ -53,17 +53,15 @@ HISTORY:
 	%put ********************************************************************;
 
 	proc sql;
-
-		connect to odbc (dsn=idi_clean_archive_srvprd);	
-
+		connect to odbc (dsn=&si_idi_dsnname.);	
 		create table work.&si_out_table. as 
-			select * from connection to odbc(
+			select * from connection to odbc (
 				/*Create temporary table for all MH access before as-at date for population table*/
-				with mhpop as(
+				with mhpop as (
 					select pop.&si_id_col.
-					from [IDI_Sandpit].&si_proj_schema..&si_table_in. pop
+					from [IDI_Sandpit].[&si_proj_schema.].&si_table_in. pop
 					where exists(
-							select 1 from  [IDI_Sandpit].&si_proj_schema..moh_diagnosis mha 
+							select 1 from  [IDI_Sandpit].[&si_proj_schema.].moh_diagnosis mha 
 							where mha.snz_uid = pop.&si_id_col.
 								and mha.end_date <= pop.&si_as_at_date.
 								and mha.event_type not in ('Potential MH','Substance use'))
@@ -71,9 +69,9 @@ HISTORY:
 				/*Create temporary table for all Substance Abuse access before as-at date for population table*/
 				adpop as(
 					select pop.&si_id_col.
-					from [IDI_Sandpit].&si_proj_schema..&si_table_in. pop
+					from [IDI_Sandpit].[&si_proj_schema.].&si_table_in. pop
 					where exists(
-							select 1 from  [IDI_Sandpit].&si_proj_schema..moh_diagnosis mha 
+							select 1 from  [IDI_Sandpit].[&si_proj_schema.].moh_diagnosis mha 
 							where mha.snz_uid = pop.&si_id_col.
 								and mha.end_date <= pop.&si_as_at_date.
 								and mha.event_type = 'Substance use')

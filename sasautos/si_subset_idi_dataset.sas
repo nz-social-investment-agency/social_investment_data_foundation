@@ -56,6 +56,7 @@ NA
 
 HISTORY:
 15 May 2017 NA v1
+May 2019 PNH: SAS grid and IDI_clean reference changes
 ************************************************************************************/;
 
 %macro si_subset_idi_dataset (sidid_infile =
@@ -89,7 +90,7 @@ HISTORY:
 			call symputx("databasecall", "idi_sandpit");
 
 		if lengthn(strip("&sidid_idiextdt")) = 0 then
-			call symputx("databasecall", "idi_clean");
+			call symputx("databasecall", "&si_idi_clean_version");
 		else call symputx("databasecall", "idi_clean_&sidid_idiextdt.");
 	run;
 
@@ -104,16 +105,17 @@ HISTORY:
 	** run extract with subsetting **;
 	** extract ids from idi tables in sandpit area using pass through *;
 	proc sql;
-		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed
-			database = &databasecall.);
+/*		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed*/
+/*			database = &databasecall.);*/
+	connect to odbc(dsn=&si_idi_dsnname.);
 		create table sidi_temp5 as
 			select a.*
-				from connection to sqlservr (select t1.* from &sidid_ididataset. t1
+				from connection to odbc (select t1.* from &sidid_ididataset. t1
 					inner join [idi_sandpit].[&sidid_targetschema].&sidid_infile. t2 
 						on t1.snz_uid = t2.&sidid_id_var
 					where cast(left(cast(t1.&sidid_ididataset_com_var. as varchar(8)),4) as int) <= year(t2.&sidid_ason_var.)
 						) as a;
-		disconnect from sqlservr;
+		disconnect from odbc;
 	quit;
 
 	proc append base = &sidioutfile. data = sidi_temp5;
@@ -122,14 +124,15 @@ HISTORY:
 			%do;
 				** loop 1 *;
 	proc sql;
-		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed
-			database = &databasecall.
-			);
+/*		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed*/
+/*			database = &databasecall.*/
+/*			);*/
+	connect to odbc(dsn=&si_idi_dsnname.);
 		create table &sidioutfile. as
 			select a.*
-				from connection to sqlservr (select * from &sidid_ididataset
+				from connection to odbc (select * from &sidid_ididataset
 					) as a;
-		disconnect from sqlservr;
+		disconnect from odbc;
 	quit;
 
 			%end;

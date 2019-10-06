@@ -19,8 +19,8 @@ provide the required parameters to the macro call and excute it:
 %si_subset_idi_dataset_census( sidid_infile = &si_table_in
 								,sidid_id_var = &si_id_col
 								,sidid_ason_var = as_at_age
-								,sidid_idiextdt = &si_idi_refresh_date
-								,sidid_ididataset = idi_clean.cen_clean.census_individual
+								,sidid_idiextdt = 
+								,sidid_ididataset = cen_clean.census_individual
 								,sidioutfile = census_qual
 								);
 
@@ -47,6 +47,7 @@ NA
 
 HISTORY:
 15 May 2017 NA v1
+May 2019 - changes for SAS Grid and idi_clean references. PNH
 ************************************************************************************/;
 
 
@@ -80,7 +81,7 @@ HISTORY:
 			call symputx("databasecall", "idi_sandpit");
 
 		if lengthn(strip("&sidid_idiextdt")) = 0 then
-			call symputx("databasecall", "idi_clean");
+			call symputx("databasecall", "&si_idi_clean_version");
 		else call symputx("databasecall", "idi_clean_&sidid_idiextdt.");
 	run;
 
@@ -95,11 +96,12 @@ HISTORY:
 	** run extract with subsetting **;
 	** extract ids from idi tables in sandpit area using pass through *;
 	proc sql;
-		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed
-			database = &databasecall.);
+/*		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed*/
+/*			database = &databasecall.);*/
+	connect to odbc(dsn=&si_idi_dsnname.);
 		create table sidi_temp5 as
 			select a.* 
-				from connection to sqlservr (select t1.snz_uid,
+				from connection to odbc (select t1.snz_uid,
 					cen_ind_sndry_scl_qual_code,
 					cen_ind_post_scl_level_code,
 					cen_ind_std_highest_qual_code 
@@ -108,7 +110,7 @@ HISTORY:
 						on t1.snz_uid = t2.&sidid_id_var
 					where  t2.&sidid_ason_var. >= 18 
 						) as a;
-		disconnect from sqlservr;
+		disconnect from odbc;
 	quit;
 
 	proc append base = &sidioutfile. data = sidi_temp5;
@@ -117,14 +119,15 @@ HISTORY:
 			%do;
 				** loop 1 *;
 	proc sql;
-		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed
-			database = &databasecall.
-			);
+/*		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed*/
+/*			database = &databasecall.*/
+/*			);*/
+				connect to odbc(dsn=&si_idi_dsnname.);
 		create table &sidioutfile. as
 			select a.*
-				from connection to sqlservr (select * from &sidid_ididataset
+				from connection to odbc (select * from &sidid_ididataset
 					) as a;
-		disconnect from sqlservr;
+		disconnect from odbc;
 	quit;
 
 			%end;

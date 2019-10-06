@@ -45,7 +45,7 @@ HISTORY:
 	/*	options mlogic mprint;*/
 	/*	options sastrace=',,,d' sastraceloc=saslog nostsuffix;*/
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table _temp_households_people_age as 
 			select * from connection to odbc(
 			select a.&si_hht_id_col. 
@@ -121,5 +121,5 @@ HISTORY:
 %mend;
 
 /* test */
-%si_get_hh_type_outcomes( si_hht_dsn = IDI_Clean, si_hht_proj_schema = DL-MAA2016-15, si_hht_table_in = si_pd_cohort, 
-	si_hht_id_col = snz_uid, si_hht_asat_date = as_at_date, si_hht_table_out = work.hht_indicators);
+/*%si_get_hh_type_outcomes( si_hht_dsn = IDI_Clean, si_hht_proj_schema = DL-MAA2016-15, si_hht_table_in = si_pd_cohort, */
+/*	si_hht_id_col = snz_uid, si_hht_asat_date = as_at_date, si_hht_table_out = work.hht_indicators);*/

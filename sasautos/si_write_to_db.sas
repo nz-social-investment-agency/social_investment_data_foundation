@@ -88,7 +88,7 @@ HISTORY:
 							%put INFO: In  si_write_to_db.sas - creating cluster index on &si_write_table_out - &si_index_cols;
 
 							proc sql;
-								connect to odbc(dsn=idi_clean_archive_srvprd);
+								connect to odbc(dsn=&si_idi_dsnname.);
 								execute(create clustered index cluster_index on 
 									[IDI_Sandpit].[&si_proj_schema].[&db_ds] (&si_index_cols)) by odbc;
 								disconnect from odbc;

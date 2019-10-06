@@ -52,7 +52,7 @@ HISTORY:
 
 	/*	options sastrace=',,,d' sastraceloc=saslog nostsuffix; */
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table &si_crd_table_out. as 
 			select * from connection to odbc(
 			select distinct a.&si_crd_id_col.

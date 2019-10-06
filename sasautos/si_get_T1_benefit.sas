@@ -18,7 +18,7 @@ In the table cost and count of benefits for the last 30 years
 AUTHOR: Wen Jhe Lee
 
 DEPENDENCIES:
-[IDI_Sandpit].[DL-MAA2016-15].[SIAL_MSD_T1_events]
+[IDI_usercode].[DL-MAA2016-15].[SIAL_MSD_T1_events]
 
 
 NOTES: 
@@ -66,7 +66,7 @@ run;
 
 /*MSD T1*/
 %si_align_sialevents_to_periods(si_table_in=[IDI_Sandpit].[&si_T1_benefits_proj_schema.].[&si_T1_benefits_table_in.],
-si_sial_table=[IDI_Sandpit].[&si_T1_benefits_proj_schema.].[SIAL_MSD_T1_events], si_as_at_date =&si_T1_benefits_asat_date., 
+si_sial_table=[IDI_Usercode].[&si_T1_benefits_proj_schema.].[SIAL_MSD_T1_events], si_as_at_date =&si_T1_benefits_asat_date., 
 si_amount_type= L, noofperiodsbefore=-30, noofperiodsafter=0, 
 si_amount_col = cost, period_duration= Year, si_out_table=raw, period_aligned_to_calendar = False
 );

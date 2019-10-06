@@ -1,4 +1,4 @@
-/*********************************************************************************************************
+﻿/*********************************************************************************************************
 TITLE: si_control_example_pd.sas
 
 DESCRIPTION: File where you can specify arguments needed to build the social investment data foundation
@@ -7,39 +7,56 @@ Users will have to specify the arguments that they want for their data foundatio
 sasprogs/si_control.sas
 
 INPUT:
-si_sandpit_libname     = the libname you use to access IDI_Sandpit
-si_proj_schema         = your project schema name
-si_debug               = retain all the intermediate datasets {True | False} 
-si_pop_table_out       = name of the table you created that contains a list of ids and dates
-si_id_col              = name of the column that has the id most likely to be snz_uid
-si_asat_date           = date when the intervention or time point of interest
-si_num_periods_before  = number of periods before hand to create service metrics for
-si_num_periods_after   = number of periods after to create service metrics for
-si_period_duration     = how long is a period {Year | Quarter | Month | Week | <integer>}
-si_amount_type         = Specify if the amount type is (L)ump sum, (D)aily or NA if there is no amount {L, D, NA}
-si_sial_amount_col     = name of the column that has the dollars in it {cost | revenue}
-si_price_index_type    = type of inflation adjustment {CPI | PPI | QEX}
-si_price_index_qtr     = reference Quarter to which Inflation adjustment is to be done
+INPUT:
+si_sandpit_libname     = the libname you use to access IDI_Sandpit ( eg: sand )
+si_proj_schema         = your project schema name ( eg: DL-MAA2016-XX )
+si_debug               = Only use for troubleshooting. This retains all the temporary datasets {True | False} 
+si_pop_table_out       = Name of the table that you intend to create in si_get_cohort.sas (with the individual IDs 
+						 and as-at dates)
+si_id_col              = name of the ID column in the "&si_pop_table_out" table, most likely to be "snz_uid"
+si_asat_date           = name of date column date in this table. (All data foundation variables are created with 
+						 respect to this date)
+si_period_duration     = Specify the time counting mechanism while creating variables. For example, if this value is
+						 "Month", all duration/cost variables will be rolled up on a monthly basis before and after 
+						 the as-at date. {Year | Quarter | Month | Week | <integer>}
+si_num_periods_before  = number of periods before the as-at date for which variables are to be generated. For example,
+						 if si_period_duration is "Month" and this parameter is "-5", then variables will be rolled up 
+						 for each of the 5 months before the as-at date.
+si_num_periods_after   = number of periods after the as-at date for which the variables will be rolled up. The usage
+						 is similar to si_num_periods_before parameter.
+si_amount_type         = Specify if the amount type is (L)ump sum, (D)aily or NA if there is no amount {L, D, NA}.
+						 Use "L", since all SIAL tables use a Lumpsum cost.
+si_sial_amount_col     = name of the column in SIAL tables that has the dollars in it {cost | revenue}. 
+						 Use "cost" as all SIAL tables call this column as "cost".
+si_price_index_type    = type of inflation adjustment to be performed on dollar amounts {CPI | PPI | QEX}
+si_price_index_qtr     = Reference Quarter to which Inflation adjustment is to be done. {For example, 2016Q2 }
 si_discount            = specify if discounting is to be done {True | False}
 si_discount_rate       = specify discounting rate e.g. 3 means 3% (value is ignored if si_discount = False)
-si_use_acc             = include ACC data {True | False} 
-si_use_cor             = include Corrections data {True | False} 
-si_use_hnz             = include Housing NZ data {True | False}   
-si_use_ird             = include IRD data {True | False}
-si_use_mix             = include MIX data {True | False}  
-si_use_moe             = include MOE data {True | False} 
-si_use_moh             = include MOH data {True | False} 
-si_use_moj             = include MOJ data {True | False} 
-si_use_msd             = include MSD data {True | False} 
-si_use_pol             = include Police data {True | False} 
+si_use_acc             = include ACC data in rollups {True | False} 
+si_use_cor             = include Corrections data in rollups {True | False} 
+si_use_hnz             = include Housing NZ data in rollups {True | False}   
+si_use_ird             = include IRD data in rollups {True | False}
+si_use_mix             = include MIX data in rollups {True | False}  
+si_use_moe             = include MOE data in rollups {True | False} 
+si_use_moh             = include MOH data in rollups {True | False} 
+si_use_moj             = include MOJ data in rollups {True | False} 
+si_use_msd             = include MSD data in rollups {True | False} 
+si_use_pol             = include Police data in rollups {True | False} 
 si_rollup_output_type  = type of rolled up table you would like{Long | Wide | Both}
-si_rollup_agg_cols     = rollup level - currently not implemented rollup is harded coded at subject area level
+						 "Long" would give tables with one row per individual per variable.
+						 "Wide" gives rollup tables with one row per individual, and each variable as a separate column.
+si_rollup_agg_cols     = rollup level - currently not implemented, rollup is harded coded at subject area level.
+						 For advanced users, just use the data foundations macros directly if the aggregation grain of rollup 
+						 is to be changed.
 si_rollup_cost         = produce cost service metrics {True | False}
 si_rollup_duration     = produce duration service metrics {True | False}
-si_rollup_count        = produce count of events based on period duration {True | False}
-si_rollup_count_sdate  = produce count of events based on the start date of the event {True | False}
+si_rollup_count        = produce count of events based on period duration. Each event will be counted in each period 
+						 that the event spans.{True | False}
+si_rollup_count_sdate  = produce count of events based on the start date of the event. Each event is counted only in the 
+						 period that the start_date of the event falls in. {True | False}
 si_rollup_dayssince    = produce days since the last event in the profile window and days since the first 
-event in the forecast window  {True | False}
+						 event in the forecast window  {True | False}
+si_idi_clean_version   = IDI Clean release to use. e.g. IDI_CLEAN_20190420;
 
 OUTPUT:
 work.control_file = sas dataset specifying every variable needed to run the si data foundation
@@ -51,54 +68,56 @@ DATE: 12 May 2017
 
 DEPENDENCIES: 
 
-NOTES: 
-A complete example is shown in ../examples/XXXXX
 
 HISTORY: 
 12 May 2017 EW v1
+jun2019 - SIAL views now have to be stored in IDI_USERcode schema -PNH
+Jul 2019 the sial name are not used anywhere. - reference is done using the project Schema
 *********************************************************************************************************/
 
 data work.control_file_long;
 	attrib si_var_name  length=$32;
-	attrib si_value     length=$20;
+	attrib si_value     length=$30;
 	input si_var_name $ si_value $;
 
 	/* specify your variables after the comma do not put a space after the comma */
 	/* do not leave spaces after variables specified */
-	/* note that because this is an example the arguments have already been populated */
+	/* note that because this is an example the arguments have already been populated */;
 	infile datalines dlm="," dsd missover;
 	datalines;
 si_sandpit_libname,sand
 si_proj_schema,DL-MAA2016-15
-si_debug,False
-si_pop_table_out,si_pd_cohort
+si_debug,True
+si_pop_table_out,SIDF_example_dataset
 si_id_col,snz_uid
 si_asat_date,as_at_date
-si_num_periods_before,-5
-si_num_periods_after,5
+si_num_periods_before,-4
+si_num_periods_after,0
 si_period_duration,Year
 si_amount_type,L
 si_sial_amount_col,cost
-si_price_index_type,CPI
-si_price_index_qtr,2000Q2
+si_price_index_type,NA
+si_price_index_qtr,NA
 si_discount,False
 si_discount_rate,3
-si_use_acc,False
+si_use_acc,True
 si_use_cor,True
-si_use_hnz,False
-si_use_ird,False
-si_use_mix,False
+si_use_hnz,True
+si_use_ird,True
+si_use_mix,True
 si_use_moe,True
-si_use_moh,False
+si_use_moh,True
 si_use_moj,True
-si_use_msd,False
+si_use_msd,True
 si_use_pol,True
+si_use_cyf,True
 si_rollup_output_type,Wide
-si_rollup_cost,True
-si_rollup_duration,True
+si_rollup_cost,False
+si_rollup_duration,False
 si_rollup_count,True
-si_rollup_count_sdate,True
-si_rollup_dayssince,True
+si_rollup_count_sdate,False
+si_rollup_dayssince,False
+si_idi_clean_version,IDI_Clean_20190420
 ;
 run;
 
@@ -114,6 +133,7 @@ run;
 /* make sure these variables are available to all macros */
 %global 
 	si_sandpit_libname    si_proj_schema 
+	si_sial_libname
 	si_debug
 	si_id_col             si_asat_date     
 	si_num_periods_before si_num_periods_after si_period_duration
@@ -123,10 +143,10 @@ run;
 	si_use_acc            si_use_cor           si_use_hnz     
     si_use_ird            si_use_mix
 	si_use_moe            si_use_moh           si_use_msd 
-	si_use_moj            si_use_pol
+	si_use_moj            si_use_pol si_use_cyf
 	si_rollup_output_type
 	si_rollup_cost        si_rollup_duration   si_rollup_count
-	si_rollup_count_sdate si_rollup_dayssince;
+	si_rollup_count_sdate si_rollup_dayssince si_idi_dsnname si_idi_clean_version;
 
 data _null_;
 	set work.control_file_wide;
@@ -157,12 +177,16 @@ data _null_;
 	call symput('si_use_moj',left(trim(si_use_moj)));
 	call symput('si_use_msd',left(trim(si_use_msd)));
 	call symput('si_use_pol',left(trim(si_use_pol)));
+	call symput('si_use_cyf',left(trim(si_use_cyf)));
 	call symput('si_rollup_output_type',left(trim(si_rollup_output_type)));
 	call symput('si_rollup_cost',left(trim(si_rollup_cost)));
 	call symput('si_rollup_duration',left(trim(si_rollup_duration)));
 	call symput('si_rollup_count',left(trim(si_rollup_count)));
 	call symput('si_rollup_count_sdate',left(trim(si_rollup_count_sdate)));
 	call symput('si_rollup_dayssince',left(trim(si_rollup_dayssince)));
+	call symput('si_idi_dsnname',cats(left(trim(si_idi_clean_version)),"_srvprd"));
+	call symput('si_idi_clean_version',left(trim(si_idi_clean_version)));
+	
 run;
 
 /* we no longer require the long version */
@@ -174,7 +198,8 @@ quit;
 /* do not modify below here */
 
 /* libname to write to db via implicit passthrough */
-libname &si_sandpit_libname ODBC dsn= idi_sandpit_srvprd schema="&si_proj_schema" bulkload=yes;
+libname &si_sandpit_libname ODBC dsn= idi_sandpit_srvprd schema="&si_proj_schema" /*bulkload=yes PNH:Bulkload nolonger supported under SAS-GRID*/;
+
 
 /* software information */
 %global si_version si_license;
@@ -197,8 +222,12 @@ run;
 %put --------------------------------------------------------------------;
 %put -------------si_control: General info-------------------------------;
 %put ....si_sandpit_libname: &si_sandpit_libname;
+%put ....si_sial_libname: &si_sial_libname;
 %put ........si_proj_schema: &si_proj_schema;
 %put ..............si_debug: &si_debug;
+%put ..............si_idi_dsnname: &si_idi_dsnname;
+%put ..............si_idi_clean_version: &si_idi_clean_version;
+
 
 /* population cohort info */
 %put ---------------------------------------------------------------------;

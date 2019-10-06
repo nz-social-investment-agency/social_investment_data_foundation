@@ -1,4 +1,4 @@
-/*******************************************************************************************************
+﻿/*******************************************************************************************************
 TITLE: si_get_highest_qualifications.sas
 
 DESCRIPTION: 
@@ -71,8 +71,11 @@ KNOWN ISSUES:
 Arbitrary age selection for the qualification to be extracted from census 2013. Hard coded Age (18 years) 
 
 HISTORY:
+ 7 Nov 2017 NA v3 Changes in tables names for house keeping and can be wrote to IDI sanddpit area 
+17 Oct 2017 NA v2 Change in variables names for moe_provider_lookup_table and moe_nzsced_code table
 15 May 2017 NA v1
-
+May 2019 PNH SAS Grid changes.
+June 2019 PNH: the format qualtif_qualcode returns string values, so changed qualificationcode to be a string variable to avoid warnings
 
 ************************************************************************************/;
 %MACRO si_get_highest_qualifications( si_table_in =
@@ -82,6 +85,14 @@ HISTORY:
 								  ,si_target_schema=
                                   ,si_out_table =
                                   ) ;
+
+%put Macro: si_get_highest_qualifications;
+%put si_table_in = &si_table_in;
+%put si_id_col = &si_id_col;
+%put si_as_at_date = &si_as_at_date;
+%put si_IDI_refresh_date=&si_IDI_refresh_date;
+%put si_target_schema=&si_target_schema;
+%put si_out_table = &si_out_table;
 
 /*	 parameters ;*/
 /*	 variables to include in outputs ;*/
@@ -110,23 +121,33 @@ HISTORY:
 	run;
 
 	** moe qualifications look up **;
+	/* SAS-GRID April 2019 - changes to connect string*/
+
 	proc sql;
-		connect to sqlservr (server = snz-idiresearch-prd-sql\ileed
-			database = idi_metadata
-			);
+		connect to odbc(dsn=&si_idi_dsnname.);
+/*			connect to sqlservr (server = snz-idiresearch-prd-sql\ileed*/
+/*			database = idi_metadata*/
+/*			);*/
+/*		*/
 		create table moe_qual_lookup as
 			select a.*
-				from connection to sqlservr (select * from clean_read_classifications.moe_qualification_lookup
+				from connection to odbc (select * from [IDI_metadata].clean_read_classifications.moe_qualification_lookup
 					) as a;
-		disconnect from sqlservr;
+		disconnect from odbc;
 	quit;
 
 	* formats *;
+	
 	%si_frmt_data_tight(fcminfile = moe_provider_lookup_table (where = (provider_code ne .) ) 
-		,fcmfmtnm = prvdcode_inst
+		,fcmfmtnm = provider_name
 		,fcmstart = provider_code
-		,fcmlabel = subsector
+		,fcmlabel = Provider_type
 		);
+/*	%si_frmt_data_tight(fcminfile = moe_provider_lookup_table (where = (provider_code ne .) ) */
+/*		,fcmfmtnm = prvdcode_inst*/
+/*		,fcmstart = provider_code*/
+/*		,fcmlabel = subsector*/
+/*		);*/
 	%si_frmt_data_tight(fcminfile = moe_ito_programme_lookup_table(where = (ito_prg_code ne .) ) 
 		,fcmfmtnm = itocode_name
 		,fcmstart = ito_prg_code
@@ -151,11 +172,17 @@ HISTORY:
 		);
 
 	** moe_nzsced_code **;
-	%si_frmt_data_tight(fcminfile = moe_nzsced_code (where = (nzscedcode ne "") ) 
+
+	%si_frmt_data_tight(fcminfile = moe_nzsced_code (where = (MOE_NZSCEDq_code ne "") ) 
 		,fcmfmtnm =  $nzscedcode_desc
-		,fcmstart = nzscedcode
+		,fcmstart = MOE_NZSCEDq_code
 		,fcmlabel = label
 		);
+/*	%si_frmt_data_tight(fcminfile = moe_nzsced_code (where = (nzscedcode ne "") ) */
+/*		,fcmfmtnm =  $nzscedcode_desc*/
+/*		,fcmstart = nzscedcode*/
+/*		,fcmlabel = label*/
+/*		);*/
 
 	************************************************************************************;
 	** 1 school qualifications  **;
@@ -185,7 +212,10 @@ HISTORY:
 			attaineded
 			endorseddate 
 			nzqa_loaddate ddmmyy10.;
-		nzqa_loaddate = input(compress(moe_sql_nzqa_load_date,"-"),yymmdd10.);
+		/* May 2019: SAS-GRID changes moe_sql_nzqa_load_date now comes through as SAS date*/
+		nzqa_loaddate = moe_sql_nzqa_load_date;
+/*		nzqa_loaddate = input(compress(moe_sql_nzqa_load_date,"-"),yymmdd10.);*/
+
 		attainedsd = min(nzqa_loaddate, mdy(12,31,moe_sql_attained_year_nbr));
 		endorseddate = min(nzqa_loaddate, mdy(12,31,moe_sql_endorsed_year_nbr));
 		attaineded = "01dec9999"d;
@@ -205,7 +235,9 @@ HISTORY:
 		qualificationtype = put(moe_sql_qual_code, qualtid_qualtyp.);
 
 		** qualification code *;
-		length qualificationcode 8.;
+		/* PNH: the format qualtif_qualcode returns string values, so changed qualificationcode to be a string variable to avoid warnings*/
+		/* Note: also changed checks on qualificationcode below*/
+		length qualificationcode $8.;
 		qualificationcode = put(moe_sql_qual_code, qualtid_qualcde.);
 
 		** determine if the ncea is counted *;
@@ -244,7 +276,7 @@ HISTORY:
 			do;
 				ha=35;
 
-				if qualificationcode= 1039 then
+				if qualificationcode= "1039" then
 					do;
 						if moe_sql_exam_result_code='E' then
 							ha=39;
@@ -264,7 +296,7 @@ HISTORY:
 			do;
 				ha=25;
 
-				if qualificationcode= 973 then
+				if qualificationcode= "0973" then
 					do;
 						if moe_sql_exam_result_code='E' then
 							ha=29;
@@ -284,7 +316,7 @@ HISTORY:
 			do;
 				ha=15;
 
-				if qualificationcode= 928 then
+				if qualificationcode= "0928" then
 					do;
 						if moe_sql_exam_result_code='E' then
 							ha=19;
@@ -467,9 +499,12 @@ HISTORY:
 		department = 'moe';
 		datamart = 'work based';
 		subject_area = 'training';
-		moe_event_sd=input(compress(moe_itl_start_date,"-"),yymmdd10.);
+/* May 2019: SAS-GRID changes: dates now coming through as SAS dates*/
+/*		moe_event_sd=input(compress(moe_itl_start_date,"-"),yymmdd10.);*/
+		moe_event_sd=moe_itl_start_date;
 		event_ed_dur = intnx('month',moe_event_sd, moe_itl_duration_months_nbr, 's');
-		attainedsd = coalesce(input(compress(moe_itl_end_date,"-"),yymmdd10.), event_ed_dur);
+/*		attainedsd = coalesce(input(compress(moe_itl_end_date,"-"),yymmdd10.), event_ed_dur);*/
+		attainedsd = coalesce(moe_itl_end_date, event_ed_dur);
 		attaineded = "01jan9999"d;
 		drop event_ed_dur moe_itl_duration_months_nbr moe_itl_start_date moe_itl_end_date moe_event_sd;
 		qualtype = "industry training";
@@ -498,8 +533,8 @@ HISTORY:
 
 	************************************************************************************;
 	** 4 combine qualifications data **;
-	data &si_out_table. /*/
-		view== &si_out_table.*/
+	data tmp /*/
+		view== tmp*/
 		;
 		format &qualvars.;
 		length qualtype $20. 
@@ -513,12 +548,12 @@ HISTORY:
 	/*to get maximum qualification */
 	proc sql;
 		create table mql_0506_qual as 
-			select a.* from &si_out_table. a
+			select a.* from tmp a
 				inner join (
 					select snz_uid,
 						max(nqflevel) as max_nqf_lvl 
 
-					from &si_out_table.
+					from tmp
 						group by snz_uid) b on 
 							a.snz_uid=b.snz_uid and a.nqflevel=b.max_nqf_lvl 
 		;
@@ -530,7 +565,7 @@ HISTORY:
 		by snz_uid;
 	run;
 
-	data &si_out_table.;
+	data tmp;
 		set mql_0506_qual;
 		by snz_uid;
 
@@ -540,17 +575,17 @@ HISTORY:
 
 	%let byvars = snz_uid attainedsd;
 
-	proc sort data = &si_out_table.;
+	proc sort data = tmp;
 		by &byvars.;
 	run;
 
 	** 4.1 subset census 2013 table to ids of interest *;
-	%si_subset_idi_dataset_census( sidid_infile = &si_table_in
+	%si_subset_idi_dataset_census(sidid_infile = &si_table_in
 		,sidid_id_var = &si_id_col
 		,sidid_targetschema=&si_target_schema
 		,sidid_ason_var = as_at_age
 		,sidid_idiextdt = &si_idi_refresh_date
-		,sidid_ididataset = idi_clean.cen_clean.census_individual
+		,sidid_ididataset = [&si_idi_clean_version.].cen_clean.census_individual
 		,sidioutfile = census_qual
 		);
 
@@ -562,11 +597,11 @@ HISTORY:
 				put(cen_ind_std_highest_qual_code, $highest_qual.) as cen_ind_std_highest_qual,
 				input(put(put(cen_ind_std_highest_qual_code, $highest_qual.), $highest_qual_lev.),3.0)  as nqflevel
 			from census_qual a
-				where a.snz_uid not in (select snz_uid from &si_out_table.);
+				where a.snz_uid not in (select snz_uid from tmp);
 	quit;
 
-	data &si_out_table._1;
-		set &si_out_table. cen_qual (keep=snz_uid cen_ind_std_highest_qual nqflevel);
+	data tmp_1;
+		set tmp cen_qual (keep=snz_uid cen_ind_std_highest_qual nqflevel);
 
 		if qualification="" then
 			highest_qual=cen_ind_std_highest_qual;
@@ -583,7 +618,7 @@ HISTORY:
 				select  snz_uid,attainedsd,nqflevel, 
 					put(put(nqflevel, z2.), $highest_qual.) as highest_qual_moe_cen
 
-				from &si_out_table._1
+				from tmp_1
 			;
 		quit;
 
@@ -601,19 +636,11 @@ run;
 			moe_ito_programme_lookup_table:
 			census_qual:
 			cen_qual:
-			&si_out_table._1:
+			tmp:
+			tmp_1:
 		;
 	run;
 
 %mend;
 
 
-
-/* %si_get_highest_qualifications( */
-/*	si_table_in = si_sofie_cohort_char_ext */
-/*	,si_id_col = snz_uid*/
-/*    ,si_as_at_date = sofie_interview_date */
-/* 	,si_idi_refresh_date = */
-/*	,si_target_schema=*/
-/*  	,si_out_table = sial_qualifications*/
-/*   	) ;*/

@@ -33,7 +33,7 @@ HISTORY:
 	%put ********************************************************************;
 
 	proc sql;
-		connect to odbc (dsn=idi_clean_archive_srvprd);
+		connect to odbc (dsn=&si_idi_dsnname.);
 		create table _temp_sandpit_tables as
 			select *
 				from connection to odbc(

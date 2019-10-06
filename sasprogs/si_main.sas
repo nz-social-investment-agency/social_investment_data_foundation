@@ -1,68 +1,106 @@
 /*********************************************************************************************************
-TITLE: si_main.sas
+DESCRIPTION: 
+	This is the main script that will build the master dataset ready for analysis. It is advised 
+	that you run this script step-by-step to understand how this works. Refer to the readme for details on
+	what the SI Data Foundation does.
 
-DESCRIPTION: main script to build the master dataset
+	Before execution, please note the following-
+
+	1. Remember that you need to update the "si_control.sas" file with all your user parameters before you actually start
+		running this SAS file. You don't need to execute it; the script will automatically be run from this main
+		file.
+	2. You also need to have edited the "si_get_cohort.sas" file with the necessary code that creates the population of 
+		individuals that you are interested in. Again, you do't need to execute it; it will be automatically run from this
+		main file.
+	3. If required, you can also edit the "si_get_characteristics_ext.sas" macro in case you want to add your own custom 
+		variables to your final dataset, which are not currently available in this data foundation.
+
+	The data foundation creates 3 kinds of variables for every individual in your population dataset, and the "as-at" date 
+	column in your population table is the reference date for those variables. The demographic/characteristic variables include 
+	things like sex, gender, region/ta/meshblock, age, etc as on the "as-at" date. The rollup variables include things like
+	duration spent on benefits, hospitalisation costs, count of events, etc for each period before and after the as-at date. 
+	The full list depends on which SIAL tables you choose to roll up. Finally, the indicator/outcome variables include things 
+	like highest qualification, disability flag, etc as on the "as-at" date.
+
+	At the end of execution, you will have a population table with all your individuals and their demographics/
+	characteristics, one rollup table for each SIAL table that you specified to be rolled up in the 
+	"si_control.sas" file, and one table per indicator variable.
 
 INPUT:
-si_control.sas = builds dataset with list of parameters
-si_source_path = full path to the folder location
+	si_control.sas = Specify the parameters which decide how the data foundation works and what variables to create.
+	si_source_path = Specify the path where you saved the SI data foundation code.
 
 OUTPUT:
-work.control_file = table used to build the global macro variables
-work.xxx = population table with name specified by user
-work.xxx_char = characteristics table - name is the population table name with a _char suffix
-work.xxx_char_ext = characteristics extension table - name is the population table name with 
-                    a _char_ext suffix
-work.XXX_XXXXX_events_rlpl = several rollup tables in a long format
-or
-work.XXX_XXXXX_events_rlpw = several rollup tables in a wide format
+	1. work.control_file = Table with the SI Data Foundation parameters specified by you.
+	2. work.xxx_char_ext = A table with all the individuals in your population, along with demographics/characteristics of 
+			those individuals as on the date specified by you.
+	3. work.XXX_XXXXX_events_rlpl = Several rollup tables in a long format with the variables you specified in the control file.
+			There will be one row per person per variable.
+
+		OR
+
+		work.XXX_XXXXX_events_rlpw = Several rollup tables in a long format with the variables you specified in the control file.
+			There will be one row per person, with each variable as a column.
+	4. work.<indicator variable> =  Several tables, one for each indicator variable.
 
 AUTHOR: E Walsh
 
-DATE: 28 Apr 2017
-
 DEPENDENCIES:
-macros are all located in the sasautos folder 
+1. The Data Foundation requires you to have the Social Investment Analytical Layer (SIAL) created on your project schema. 
+2. You need to edit the si_control.sas file and add the parameters required to run the data foundation.
+3. Edit the si_get_cohort.sas file to identify the individuals that you want to create the variables for, and the date as on
+	which these variables will be created for. Every individual can have a different date if required.
 
 NOTES: 
-wide tables are preferred but in some cases column names may exceed 32 characters hence a long format
-has also been made available
 
 HISTORY: 
+25 Aug 2017 VB Added more comments.
 28 Apr 2017 EW v1
+Apri 2019 PNH: SAS-GRID Updates
 *********************************************************************************************************/
-/*options mlogic mprint;*/
-/* user specified input  in the main script */
 
-/* location where the folders are stored */
-%let si_source_path = \\wprdfs08\MAA2016-15 Supporting the Social Investment Unit\social_investment_data_foundation;
+
+/*	This section is for the user of the data foundation to edit and set up the environment variables in the main script.
+	Uncomment the below statement for detailed logs for the code execution- Use this when you  are troubleshooting*/
+/*options mlogic mprint;*/
+
+/* This is the location where you've stored the data foundation code- including the top level folder name of the data foundation. 
+	Ensure you've read the DESCRIPTION and DEPENDENCIES section above before you run the main script!!
+*/
+%let si_source_path = /nas/DataLab/MAA/MAA2016-15 Supporting the Social Investment Unit/social_investment_data_foundation;;
+
+
 
 /*********************************************************************************************************/
 
-/* time the run to help plan for future re-runs if necessary */
+/* Set up a variable to store the runtime of the script; this helps to plan for future re-runs of code if necessary */
 %global si_main_start_time;
 %let si_main_start_time = %sysfunc(time());
 
-/* load all the macros */
+/* Load all the macros required for the data foundation*/
 options obs=MAX mvarsize=max pagesize=132
-        append=(sasautos=("&si_source_path.\sasautos"));
+        append=(sasautos=("&si_source_path./sasautos"));
 
-/* specify global variables that are used by more than one macro */
-%include "&si_source_path.\sasprogs\si_control.sas";
+/* Load the user's parameters and global variables that define how the data foundation works from the control file */
+%include "&si_source_path./sasprogs/si_control.sas";
+%include "&si_source_path./include/libnames.sas";
 
-/* generate a population - the output should contain a column for the ids and a column for the as at date */
-%include "&si_source_path.\sasprogs\si_get_cohort.sas";
+/* Generate the population for which the data foundation variables will be created - the output of the below script
+	will be a SAS dataset that should contain a column for the IDs of individuals,  and a column for the as-at date (which
+	is the date as on which the variables will be calculated).*/
+%include "&si_source_path./sasprogs/si_get_cohort.sas";
 
-/* formats required by some macros */
-%include "&si_source_path.\include\si_moe_formats.sas";
+/* Loads SAS formats required by the data foundation */
+%include "&si_source_path./include/si_moe_formats.sas";
 
-/* push to the database so that master characteristics can run an explicit pass through */
+/* Push the population cohort table to the database so that the characteristic/demographic variables of the individuals can be obtained,
+	using an explicit pass-through which is more efficient.*/
 %si_write_to_db(si_write_table_in=&si_pop_table_out.,
 	si_write_table_out=&si_sandpit_libname..&si_pop_table_out.
 	,si_cluster_index_flag=True,si_index_cols=%bquote(&si_id_col., &si_asat_date.)
 	);
 
-/* generate static variables tied mainly to demographics and identification */
+/* Generate static variables for individuals in the population, which mainly consist of demographics and IDI linking variables */
 %si_get_characteristics(
 	si_char_proj_schema=&si_proj_schema., 
 	si_char_table_in=&si_pop_table_out., 
@@ -70,14 +108,15 @@ options obs=MAX mvarsize=max pagesize=132
 	si_char_table_out=work.&si_pop_table_out._char
 	);
 
-/* stub for people to restrict records that are linked to a spine etc and the opportunity to add more columns */
-/* if you want a characteristic that is not currently generated */
+/* This macro is a stub for users of the data foundation to add custom variables or perform additional filtering/processing.
+   You would have edited this macro if you wanted to customise the dataset. If not, the output of this macro is the same
+	as the input dataset. */
 %si_get_characteristics_ext(
 	si_char_ext_table_in=&si_pop_table_out._char,
 	si_char_ext_table_out=&si_pop_table_out._char_ext
 );
 
-/* push to the database so that master characteristics can run an explicit pass through */
+/* Push to the database so that master characteristics can run an explicit pass through */
 %si_write_to_db(
 	si_write_table_in=&si_pop_table_out._char_ext, 
 	si_write_table_out=&si_sandpit_libname..&si_pop_table_out._char_ext,
@@ -85,26 +124,44 @@ options obs=MAX mvarsize=max pagesize=132
 	si_index_cols=%bquote(&si_id_col., &si_asat_date.)
 );
 
-/* now that we have a final pop table in the database with characteristics we can drop the earlier one */
+/* Now that we have a final population table in the database with characteristics, we drop the first table as it is not 
+	required anymore.*/
 %si_conditional_drop_table(
 si_cond_table_in =&si_sandpit_libname..&si_pop_table_out.
 );
 
-/* there is potential for some of this code below the line to run in parallel once the grid is up and running */
+/* IMPORTANT NOTE: 
+	At this point, you may want to check your schema in IDI_Sandpit to ensure that the population dataset is created there.
+	The table will be called &si_pop_table_out._char_ext (where &si_pop_table_out is the name you specified in the si_control file.)
+*/
 
-/* obtain the SIAL related events and costs within the observation horizon for the population table */ 
-/* apply inflation adjustments to costs if required. The SIAL tables that will be rolled up depends on */
-/* the configuration in the si_control.sas */
+
+/* Now, we move to stage 2 of the code.
+	Here, we roll up the SIAL tables to create a bunch of variables for the individuals in your population dataset. These variables
+	will be what you specified in the control file- you can have costs, durations, counts, etc for each period duration as specified 
+	in the control file. These variables will be created for each agency datasets you specified in the control file.
+
+	There is potential for some of this code below the line to run in parallel once STATSNZ enables the SASGRID 
+*/
+
+
+/* This macro is a wrapper to roll up each SIAL table to create cost/duration/count variables within the observation horizon for your 
+	population table. Also applies inflation adjustments & discounting to costs if specified. The SIAL tables that will be rolled up 
+	depends on the configuration in the si_control.sas */
 %si_wrapper_sial_rollup(si_wrapper_proj_schema=&si_proj_schema.);
 
 
-/* this section calls all the outcome variables - users can add extra macro calls in here for their own */
-/* customised outcome variables */
+
+/* Now, we move to stage 3 of the code.
+	This section creates the "indicator" variables for the individuals in the population. These would be variables like highest 
+	educational qualification for individuals on the as-at date, or mental health services access flag, or other similar indicators,
+	which can be quite bespoke or ad-hoc. You can add extra indicator variables in this macro, and you're welcome to contribute your 
+	new variables to the dictionary of such variables that we maintain on the Github repository.
+*/
 %si_get_outcomes_ext;
 
-/* view run statistics such as names of tables, run time etc */
-/* this will help users understand what the SI data foundation has built */
-/* still a work in progress */
+/* View run-statistics such as names of tables, run-time etc */
+/* This will help you understand what the SI data foundation has built, and plan future runs */
 %si_summarise_run(si_summ_proj_schema =&si_proj_schema.);
 
 

@@ -66,17 +66,17 @@ HISTORY:
 
 		proc sql;
 
-			connect to odbc (dsn=idi_clean_archive_srvprd);
+			connect to odbc (dsn=&si_idi_dsnname.);
 
 			select tname 
 				into :&si_out_var. separated by " " 
 			from connection to odbc (
-				select distinct v.name as tname from [IDI_Sandpit].sys.objects v
-				inner join [IDI_Sandpit].sys.schemas s on (v.schema_id = s.schema_id)
+				select distinct v.name as tname from [IDI_usercode].sys.objects v
+				inner join [IDI_usercode].sys.schemas s on (v.schema_id = s.schema_id)
 				where 
 					s.name = %bquote('&si_schema_name.') 
 					and upper(v.name) like upper('SIAL_' + upper( %bquote('&si_agency_tag.') ) +'_%_events')
-					and exists (select 1 from [IDI_Sandpit].sys.columns c 
+					and exists (select 1 from [IDI_usercode].sys.columns c 
 								where c.object_id=v.object_id and upper(c.name) = upper(%bquote('&si_column_name.') ) )
 			);
 
@@ -90,17 +90,17 @@ HISTORY:
 	%else %do;
 		proc sql;
 
-			connect to odbc (dsn=idi_clean_archive_srvprd);
+			connect to odbc (dsn=&si_idi_dsnname.);
 
 			select tname 
 				into :&si_out_var. separated by " " 
 			from connection to odbc (
-				select distinct v.name as tname from [IDI_Sandpit].sys.objects v
-				inner join [IDI_Sandpit].sys.schemas s on (v.schema_id = s.schema_id)
+				select distinct v.name as tname from [IDI_usercode].sys.objects v
+				inner join [IDI_usercode].sys.schemas s on (v.schema_id = s.schema_id)
 				where 
 					s.name = %bquote('&si_schema_name.') 
 					and upper(v.name) like upper('SIAL_' + upper( %bquote('&si_agency_tag.') ) +'_%_events')
-					and not exists (select 1 from [IDI_Sandpit].sys.columns c 
+					and not exists (select 1 from [IDI_usercode].sys.columns c 
 								where c.object_id=v.object_id and upper(c.name) = upper(%bquote('&si_column_name.') ) )
 			);
 
@@ -119,7 +119,7 @@ options mlogic mprint;
 
 %macro tester;
 %local testervar;
-%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moe, si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = testervar);
+%si_fetch_sial_datasets_by_agency(si_schema_name = DL-MAA2016-15, si_agency_tag = moh, si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = testervar);
 %put &testervar;
 %mend;
 

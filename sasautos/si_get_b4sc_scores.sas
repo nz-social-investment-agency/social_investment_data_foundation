@@ -30,7 +30,6 @@ NOTES:
 
 HISTORY: 
 23 Jun 2017 EW v1
-July 2019 - IDI_CLean now needs to be IDI_Clean_YYYYDDMM
 *********************************************************************************************************/
 %macro si_get_b4s_outcomes( si_b4s_dsn = IDI_Clean, si_b4s_proj_schema =, si_b4s_table_in =, 
 			si_b4s_id_col = snz_uid, si_b4s_asat_date =, si_b4s_table_out =);
@@ -56,11 +55,6 @@ July 2019 - IDI_CLean now needs to be IDI_Clean_YYYYDDMM
 				, b.[moh_bsc_general_outcome_text] as b4sc_outcome
 				, b.[moh_bsc_sdqp_outcome_text] as b4sc_sdqp_outcome
 				, b.[moh_bsc_sdqt_outcome_text] as b4sc_sdqt_outcome
-				, b.[moh_bsc_vision_outcome_text] as b4sc_vision_outcome
-				, b.[moh_bsc_hearing_outcome_text] as b4sc_hearing_outcome
-				, b.[moh_bsc_growth_outcome_text] as b4sc_growth_outcome
-				, b.[moh_bsc_dental_outcome_text] as b4sc_dental_outcome
-				, b.[moh_bsc_peds_outcome_text] as b4sc_peds_outcome
 			from [IDI_Sandpit].[&si_b4s_proj_schema].[&si_b4s_table_in] a
 				inner join (
 					select [&si_b4s_id_col]
@@ -68,12 +62,7 @@ July 2019 - IDI_CLean now needs to be IDI_Clean_YYYYDDMM
 						,[moh_bsc_general_outcome_text]
 						,[moh_bsc_sdqp_outcome_text]
 						,[moh_bsc_sdqt_outcome_text]
-						,[moh_bsc_vision_outcome_text]
-						,[moh_bsc_hearing_outcome_text]
-						,[moh_bsc_growth_outcome_text]
-						,[moh_bsc_dental_outcome_text]
-						,[moh_bsc_peds_outcome_text]
-					from [&si_b4s_dsn].[moh_clean].[b4sc]
+					from [IDI_Clean].[moh_clean].[b4sc]
 						) b on a.&si_b4s_id_col = b.&si_b4s_id_col
 					where b.moh_bsc_check_date <= a.&si_b4s_asat_date
 						);
@@ -81,3 +70,7 @@ July 2019 - IDI_CLean now needs to be IDI_Clean_YYYYDDMM
 	quit;
 
 %mend;
+
+/* test */
+%si_get_b4s_outcomes( si_b4s_dsn = IDI_Clean, si_b4s_proj_schema = DL-MAA2016-15, si_b4s_table_in = si_pd_cohort, 
+	si_b4s_id_col = snz_uid, si_b4s_asat_date = as_at_date, si_b4s_table_out = work.b4s_indicators);

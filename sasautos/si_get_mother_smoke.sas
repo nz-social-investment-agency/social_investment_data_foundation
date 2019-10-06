@@ -48,7 +48,7 @@ HISTORY:
 	%put ********************************************************************;
 
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table &si_mother_smoke_table_out. as 
 			select * from connection to odbc(
 			select distinct * from (

@@ -230,11 +230,7 @@ HISTORY:
 
 
 	proc sql;
-
-		connect to odbc(dsn=idi_clean_archive_srvprd);
-
-
-
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table work._temp_sial_sub as 
 			select * from connection to odbc(
 				select 
@@ -254,6 +250,17 @@ HISTORY:
 
 	quit;
 	
+	/* In case of end dates larger than current datetime, we replace with current datetime here to prevent unnecessary processing overhead*/ 
+	data work._temp_sial_sub;
+		set work._temp_sial_sub;
+		if length(compress(put(end_date,20.))) <9 then do;
+			end_date = min(end_date, date() );
+			end;
+		else do;
+			end_date = min(end_date, datetime() );
+		end;
+	run;
+	
 	/* Apply inflation adjustment if required by input parameters*/
 	%if &si_pi_type. ne NA %then %do;
 		%si_apply_pi_adjustment(si_table_in = work._temp_sial_sub, si_pi_type = &si_pi_type. , si_ref_quarter = &si_pi_qtr. , si_amount_type = &si_amount_type. , 
@@ -272,8 +279,19 @@ HISTORY:
 		set work._temp_sial_sub;
 
 		/* Temporarily store the event start & end dates */
-		event_sdate = start_date;
-		event_edate = min(end_date, datetime() );		
+		/* APRIL 2019 : SAS Grid changes - allow for states to be either SAS Dates or Date times.*/
+			if length(compress(put(start_date,20.))) <9 then do;
+				event_sdate = dhms(start_date,0,0,0);
+				end;
+			else do;
+				event_sdate = start_date;
+			end;
+			if length(compress(put(end_date,20.))) <9 then do;
+				event_edate = dhms(end_date,0,0,0);
+				end;
+			else do;
+				event_edate = end_date;
+			end;
 		start_date = .;
 		end_date = .;
 		full_amount = &si_amount_col. ;

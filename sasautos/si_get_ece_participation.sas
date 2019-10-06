@@ -46,14 +46,14 @@ si_ece_asat_date =, si_ece_table_out =);
 	%put ********************************************************************;
 
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table &si_ece_table_out. as 
 			select * from connection to odbc(
 			select distinct
 			a.*
 				,1 as ece_&si_ece_type._flag
 			from [IDI_Sandpit].[&si_ece_proj_schema.].[&si_ece_table_in.] a
-				left join [IDI_Sandpit].[&si_proj_schema.].[SIAL_MOE_ece_events] b
+				left join [IDI_USERcode].[&si_proj_schema.].[SIAL_MOE_ece_events] b
 				on a.&si_ece_id_col. = b.&si_ece_id_col.
 				where b.event_type = 'True'
 					%if "&si_ece_type" = "Kohanga" %then

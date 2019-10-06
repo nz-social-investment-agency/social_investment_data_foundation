@@ -38,7 +38,8 @@ The address changes are limited by the duration for which the address changes ar
 individual interacts/notifies the agencies of the change in address.
 
 HISTORY: 
-26 Jun 2017		Vinay Benny		v1 
+26 Jun 2017		Vinay Benny		v1
+July 2019 PNH - put [] around schema name for Linux. 
 *********************************************************************************************************/
 
 %macro si_get_freq_address_changes(si_idiclean_version=, si_proj_schema=, si_table_in=, si_id_col = snz_uid,
@@ -63,14 +64,14 @@ si_as_at_date = , si_nbr_address_changes= , si_nbr_periods= , si_out_table= );
 
 	proc sql;
 
-		connect to odbc (dsn=idi_clean_archive_srvprd);	
+		connect to odbc (dsn=&si_idi_dsnname.);	
 
 		create table work.si_out_table as 
 			select * from connection to odbc(
 				select pop.&si_id_col. 
 				from 
-				IDI_Sandpit.&si_proj_schema..&si_table_in. pop
-				inner join &si_idiclean_version..data.address_notification addr on (pop.&si_id_col. = addr.snz_uid)
+				IDI_Sandpit.[&si_proj_schema.].&si_table_in. pop
+				inner join [&si_idiclean_version.].data.address_notification addr on (pop.&si_id_col. = addr.snz_uid)
 				where ant_notification_date between dateadd(yyyy, -1 * &si_nbr_periods., pop.&si_as_at_date.) and pop.&si_as_at_date.
 				group by pop.&si_id_col.
 				having count(*) > &si_nbr_address_changes.

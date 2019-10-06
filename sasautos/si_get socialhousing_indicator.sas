@@ -58,7 +58,7 @@ si_id_col = snz_uid, si_as_at_date =, si_out_table= );
 
 	proc sql;
 
-		connect to odbc (dsn=idi_clean_archive_srvprd);	
+		connect to odbc (dsn=&si_idi_dsnname.);	
 
 		create table work.&si_out_table. as 
 			select * from connection to odbc(

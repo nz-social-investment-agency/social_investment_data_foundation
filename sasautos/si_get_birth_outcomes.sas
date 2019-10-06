@@ -25,8 +25,9 @@ personal details
 
 HISTORY: 
 21 Jun 2017 EW v1
+July 2019 - IDI_Clean no longer valid as default.
 *********************************************************************************************************/
-%macro si_get_birth_outcomes( si_bir_dsn = IDI_Clean, si_bir_proj_schema =, si_bir_table_in =, 
+%macro si_get_birth_outcomes( si_bir_dsn = , si_bir_proj_schema =, si_bir_table_in =, 
 			si_bir_id_col = snz_uid, si_bir_asat_date =, si_bir_table_out =);
 	%put ********************************************************************;
 	%put --------------------------------------------------------------------;
@@ -44,7 +45,7 @@ HISTORY:
 	%put ********************************************************************;
 
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table &si_bir_table_out. as 
 			select * from connection to odbc(
 			select a.&si_bir_id_col.

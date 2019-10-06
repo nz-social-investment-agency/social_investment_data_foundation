@@ -108,7 +108,7 @@ HISTORY:
 	run;
 
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table pah as 
 			select * from connection to odbc(
 

@@ -32,13 +32,17 @@ HISTORY:
 *********************************************************************************************************/
 
 /* create a single table with all the characteristics in an efficient manner */
+
+/* PNH: Note, this code only works if the wide format tables have been created.
+si_rollup_output_type=W (or B)*/;
+
 data si_data_foundation_pd (drop = return_code:);
-	set si_pd_cohort_char_ext;
+	set SIDF_EXAMPLE_DATASET_char_ext;
 
 	if _n_ = 1 then
 		do;
 			if 0 then
-				set work.cor_sentence_events_rlpw (keep = snz_uid p_cor_mmp_sar_dur);
+			set work.cor_sentence_events_rlpw (keep = snz_uid p_cor_mmp_sar_dur);
 			declare hash hcor (dataset: 'work.cor_sentence_events_rlpw (keep = snz_uid p_cor_mmp_sar_dur)');
 			hcor.definekey('snz_uid');
 
@@ -73,16 +77,16 @@ data si_data_foundation_pd (drop = return_code:);
 
 			/* example of keeping a particular year */
 			if 0 then
-				set work.moe_school_events_rlpw (keep = snz_uid p1: f1:);
-			declare hash hsch (dataset: 'work.moe_school_events_rlpw (keep = snz_uid p1: f1:)');
+				set work.moe_school_events_rlpw (keep = snz_uid p1: f0:);
+			declare hash hsch (dataset: 'work.moe_school_events_rlpw (keep = snz_uid p1: f0:)');
 			hsch.definekey('snz_uid');
             hsch.definedata(all: 'yes');
 			hsch.definedone();
 
-			/* keeping the window variables p_ and f_ */
+			/* keeping the prior events variables p_ */
 			if 0 then
-				set work.moe_tertiary_events_rlpw (keep = snz_uid p_: f_:);
-			declare hash hter (dataset: 'work.moe_tertiary_events_rlpw (keep = snz_uid p_: f_:)');
+				set work.moe_tertiary_events_rlpw (keep = snz_uid p_: );
+			declare hash hter (dataset: 'work.moe_tertiary_events_rlpw (keep = snz_uid p_: ');
 			hter.definekey('snz_uid');
 	        hter.definedata(all: 'yes');
 			hter.definedone();
@@ -98,8 +102,8 @@ data si_data_foundation_pd (drop = return_code:);
 
 			/* couple of forecast variables */
 			if 0 then
-				set work.pol_offender_events_rlpw (keep = snz_uid f1: f2:);
-			declare hash hoff (dataset: 'work.pol_offender_events_rlpw (keep = snz_uid f1: f2:)');
+				set work.pol_offender_events_rlpw (keep = snz_uid f0: );
+			declare hash hoff (dataset: 'work.pol_offender_events_rlpw (keep = snz_uid f0:)');
 			hoff.definekey('snz_uid');
 	        hoff.definedata(all: 'yes');
 			hoff.definedone();
@@ -114,10 +118,10 @@ data si_data_foundation_pd (drop = return_code:);
 
 			/* the outcome variable */
 			if 0 then
-				set work.sial_qualifications (keep = snz_uid nqflevel highest_qual);
-			declare hash hhqu (dataset: 'work.sial_qualifications (keep = snz_uid nqflevel highest_qual)');
+				set work.sial_qualifications (keep = snz_uid nqflevel highest_qual_moe_cen);
+			declare hash hhqu (dataset: 'work.sial_qualifications (keep = snz_uid nqflevel highest_qual_moe_cen)');
 			hhqu.definekey('snz_uid');
-			hhqu.definedata('nqflevel', 'highest_qual');
+			hhqu.definedata('nqflevel', 'highest_qual_moe_cen');
 			hhqu.definedone();
 		end;
 
@@ -190,7 +194,7 @@ data si_data_foundation_pd (drop = return_code:);
 	return_code_hhqu = hhqu.find();
 
 	if return_code_hhqu ne 0 then
-		call missing(nqflevel, highest_qual);
+		call missing(nqflevel, highest_qual_moe_cen);
 run;
 
 proc contents data=si_data_foundation_pd;

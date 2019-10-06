@@ -42,7 +42,7 @@ out_format = [Long Wide Both] Specify if the output format of the table should b
 
 Sample call:
 %si_create_rollup_vars(si_table_in=work.test, si_sial_table=work.test2, si_out_table=work.test3, 
-	si_agg_cols= %str(department datamart subject_area), cost = True, duration = False, count = True, dayssince = True );
+	si_agg_cols= %str(department datamart subject_area), cost = True, duration = False, count = True, dayssince = True);
 
 
 
@@ -114,7 +114,8 @@ HISTORY:
 			%let i = %eval(&i. + 1);
 		%end;
 		
-	%end;	
+	%end;
+	
 	%put &commasep_aggcols.;
 	%put &pipesep_aggcols.;
 	
@@ -134,11 +135,10 @@ HISTORY:
 	%else %do;
 		%let sql_cost_statement = sum(sial.&si_amount_col.) as cst, ;
 	%end;
-
+	
 
 	/* For each value of ref_periods, create the cost, duration and count rolled-up variables for every individual in main table.*/
 	proc sql;
-
 		/* Do all aggregation in one go*/
 		create table work._temp_summary_tab as			
 			select 
@@ -191,7 +191,7 @@ HISTORY:
 	
 	
 	/* If the cost variables are required*/
-	%if &cost. = True %then %do;
+	%if %TRIM(&cost.) = True %then %do;
 
 		proc sql;
 			create table work._temp_cst_tab as
@@ -204,7 +204,8 @@ HISTORY:
  
 		
 	%end;
-
+	/* If the cost variables are required*/
+	
 	/* If the duration variables are required*/
 	%if &duration. = True %then %do; 
 
@@ -285,6 +286,7 @@ HISTORY:
 
 		run;
 	%end;
+	%put ---DEBUG Line 1---;
 	/* If only wide version is requested, drop the long version of output table*/
 	%if &si_rollup_ouput_type. eq Wide %then %do;
 		proc sql;
@@ -292,7 +294,7 @@ HISTORY:
 		quit;
 	%end;
 	
-
+	%put ---DEBUG Line2---;
 	/* Clean up temp datasets*/
 	%if &si_debug. = False %then %do;
 		proc datasets lib=work;

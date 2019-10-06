@@ -49,7 +49,7 @@ HISTORY:
 	%put ********************************************************************;
 
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table diabetes1 as 
 			select * from connection to odbc(
 				/*			Users cohort*/
@@ -120,7 +120,7 @@ HISTORY:
 
 	/*Retrieving lab related diabetes events*/
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table diabetes3 as 
 			select * from connection to odbc(
 			select * from [IDI_Sandpit].[&si_diabetes_proj_schema.].[&si_diabetes_table_in.] a
@@ -201,7 +201,7 @@ HISTORY:
 
 	/*Retrieving cohort of interest*/
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table cohort as 
 			select * from connection to odbc(
 			select *

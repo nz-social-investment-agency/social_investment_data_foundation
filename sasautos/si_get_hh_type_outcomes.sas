@@ -45,7 +45,7 @@ HISTORY:
 	/*	options mlogic mprint;*/
 	/*	options sastrace=',,,d' sastraceloc=saslog nostsuffix;*/
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table _temp_households_people_age as 
 			select * from connection to odbc(
 			select a.&si_hht_id_col. 

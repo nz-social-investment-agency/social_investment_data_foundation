@@ -28,6 +28,7 @@ V Benny
 DATE: 15 May 2017
 
 HISTORY: 
+07 Nov 2017 WJ added cyf v1.1
 15 May 2017 VB v1
 *******************************************************************************************************/
 
@@ -44,7 +45,6 @@ HISTORY:
 	
 	/* Enable rollup for MOE SIAL Tables & Views */
 	%if &si_use_moe. eq True %then %do;
-		
 		/* Fetch list of SIAL MOE tables with costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moe, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
@@ -52,6 +52,21 @@ HISTORY:
 		%let outmacrovar=;
 		/* Fetch list of SIAL MOE tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = moe, 
+			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
+		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
+		%let outmacrovar=;
+	%end;
+
+	/* Enable rollup for CYF SIAL Tables & Views */
+	%if &si_use_cyf. eq True %then %do;
+		
+		/* Fetch list of SIAL CYF tables with costs*/
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = cyf, 
+			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
+		%let cost_loop_list = &cost_loop_list. &outmacrovar. ;
+		%let outmacrovar=;
+		/* Fetch list of SIAL CYF tables without costs*/
+		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = cyf, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
@@ -162,30 +177,30 @@ HISTORY:
 		%let outmacrovar=;
 	%end;
 
-	/* Enable rollup for Police SIAL Tables & Views */
+	/* Enable rollup for Housing New Zealand SIAL Tables & Views */
 	%if &si_use_hnz. eq True %then %do;
 		
-		/* Fetch list of SIAL Police tables with costs*/
+		/* Fetch list of SIAL Housing New Zealand tables with costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = hnz, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
-		/* Fetch list of SIAL Police tables without costs*/
+		/* Fetch list of SIAL Housing New Zealand tables without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = hnz, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
 		%let outmacrovar=;
 	%end;
 
-	/* Enable rollup for Police SIAL Tables & Views */
+	/* Enable rollup for mixed abuse Views */
 	%if &si_use_mix. eq True %then %do;
 		
-		/* Fetch list of SIAL Police tables with costs*/
+		/* Fetch list of mixed abuse views with costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = mix, 
 			si_fetch_tab_with_column = True, si_column_name = cost, si_out_var = outmacrovar);
 		%let cost_loop_list = &cost_loop_list. &outmacrovar.;
 		%let outmacrovar=;
-		/* Fetch list of SIAL Police tables without costs*/
+		/* Fetch list of mixed abuse views without costs*/
 		%si_fetch_sial_datasets_by_agency(si_schema_name = &si_wrapper_proj_schema., si_agency_tag = mix, 
 			si_fetch_tab_with_column = False, si_column_name = cost, si_out_var = outmacrovar);
 		%let nocost_loop_list = &nocost_loop_list. &outmacrovar. ;
@@ -200,7 +215,7 @@ HISTORY:
 		/* Create the events subsetted and broken to fit to the specified profile & forecast windows with inflation adjusted costs*/
 		%si_align_sialevents_to_periods(
 			si_table_in=[IDI_Sandpit].[&si_proj_schema.].&si_pop_table_out._char_ext,	/* Output table from get_characteristics_ext */
-			si_sial_table=[IDI_Sandpit].[&si_proj_schema.].&viewname. , 				/* The SIAL table in the current loop iteration */						
+			si_sial_table=[IDI_USercode].[&si_proj_schema.].&viewname. , 				/* The SIAL table in the current loop iteration */						
 			si_id_col = &si_id_col. , 
 			si_as_at_date = &si_asat_date. ,
 			si_amount_type = &si_amount_type. , 
@@ -251,6 +266,7 @@ HISTORY:
 		%end;
 
 		/* Create the roll-up variables */
+
 		%si_create_rollup_vars(
 			si_table_in = sand.&si_pop_table_out._char_ext , 
 			si_sial_table = %substr(&viewname._disc, 6, %eval(%length(&viewname._disc) - 5) ),	/* Example: MOE_tertiary_events_disc */
@@ -259,11 +275,11 @@ HISTORY:
 			si_id_col = &si_id_col. ,
 			si_as_at_date = &si_asat_date. ,
 			si_amount_col = &si_sial_amount_col. ,
-			cost = True, 
-			duration = True, 
-			count = True, 
-			count_startdate = True, 
-			dayssince = True,
+			cost = &si_rollup_cost., 
+			duration = &si_rollup_duration., 
+			count = &si_rollup_count., 
+			count_startdate = &si_rollup_count_sdate., 
+			dayssince = &si_rollup_dayssince.,
 			si_rollup_ouput_type = &si_rollup_output_type.
 		);
 
@@ -283,7 +299,7 @@ HISTORY:
 	%end;
 
 
-
+    
 	/* Loop through SIAL table list without costs and create inflation/discounting-adjusted & period-level rolled up variables*/
 	%let counter=1;
 	%do %while (%scan (&nocost_loop_list., &counter.) ne );
@@ -292,7 +308,7 @@ HISTORY:
 		/* Create the events subsetted and broken to fit to the specified profile & forecast windows with inflation adjusted costs*/
 		%si_align_sialevents_to_periods(
 			si_table_in=[IDI_Sandpit].[&si_proj_schema.].&si_pop_table_out._char_ext,	/* Output table from get_characteristics_ext */
-			si_sial_table=[IDI_Sandpit].[&si_proj_schema.].&viewname. , 				/* The SIAL table in the current loop iteration */						
+			si_sial_table=[IDI_usercode].[&si_proj_schema.].&viewname. , 				/* The SIAL table in the current loop iteration */						
 			si_id_col = &si_id_col. , 
 			si_as_at_date = &si_asat_date. ,
 			si_amount_type = NA,  
@@ -313,10 +329,10 @@ HISTORY:
 			si_amount_col = NA,
 			si_as_at_date = &si_asat_date. ,
 			cost = False, 
-			duration = True, 
-			count = True, 
-			count_startdate = True, 
-			dayssince = True,
+			duration = &si_rollup_duration., 
+			count = &si_rollup_count., 
+			count_startdate = &si_rollup_count_sdate., 
+			dayssince = &si_rollup_dayssince.,
 			si_rollup_ouput_type = &si_rollup_output_type.
 		);
 

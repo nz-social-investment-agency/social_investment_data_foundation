@@ -25,6 +25,7 @@ NOTES:
 
 HISTORY: 
 28 Apr 2017 EW v1
+May 2019 - Changes for SAS Grid - PNH
 ****************************************************************/
 %macro si_get_outcomes_ext();
 	%put ********************************************************************;
@@ -41,7 +42,7 @@ HISTORY:
 		si_table_in = &si_pop_table_out._char_ext
 		,si_id_col = &si_id_col.
 		,si_as_at_date = &si_asat_date. 
-		,si_IDI_refresh_date = 
+		,si_IDI_refresh_date = %substr(&si_idi_clean_version,11,8)
 		,si_target_schema = &si_proj_schema.
 		,si_out_table = SIAL_Qualifications
 		);

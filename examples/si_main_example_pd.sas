@@ -1,4 +1,4 @@
-/*********************************************************************************************************
+﻿/*********************************************************************************************************
 TITLE: si_main_example_pd.sas
 
 DESCRIPTION: main script to build the master dataset
@@ -32,12 +32,14 @@ has also been made available
 
 HISTORY: 
 28 Apr 2017 EW v1
+April 2019 PNH: SAS-GRID changes
 *********************************************************************************************************/
+/*options nomprint nosymbolgen;*/
+options mprint nosymbolgen;
 
-/*options mlogic mprint;*/
 /* user specified input  in the main script */
 /* location where the folders are stored */
-%let si_source_path = \\wprdfs08\MAA2016-15 Supporting the Social Investment Unit\social_investment_data_foundation;
+%let si_source_path = /nas/DataLab/MAA/MAA2016-15 Supporting the Social Investment Unit/social_investment_data_foundation;
 
 /*********************************************************************************************************/
 /* time the run to help plan for future re-runs if necessary */
@@ -46,16 +48,16 @@ HISTORY:
 
 /* load all the macros */
 options obs=MAX mvarsize=max pagesize=132
-	append=(sasautos=("&si_source_path.\sasautos"));
+	append=(sasautos=("&si_source_path./sasautos"));
 
 /* specify global variables that are used by more than one macro */
-%include "&si_source_path.\examples\si_control_example_pd.sas";
+%include "&si_source_path./examples/si_control_example_pd.sas";
 
 /* generate a population - the output should contain a column for the ids and a column for the as at date */
-%include "&si_source_path.\examples\si_get_cohort_example_pd.sas";
+%include "&si_source_path./examples/si_get_cohort_example_pd.sas";
 
 /* formats required by some macros */
-%include "&si_source_path.\include\si_moe_formats.sas";
+%include "&si_source_path./include/si_moe_formats.sas";
 
 /* push to the database so that master characteristics can run an explicit pass through */
 %si_write_to_db(si_write_table_in=&si_pop_table_out.,
@@ -91,7 +93,11 @@ options obs=MAX mvarsize=max pagesize=132
 	si_cond_table_in =&si_sandpit_libname..&si_pop_table_out.
 	);
 
-/* there is potential for some of this code below the line to run in parallel once the grid is up and running */
+/* Now, we move to stage 2 of the code.
+	Here, we roll up the SIAL tables to create a bunch of variables for the individuals in your population dataset. These variables
+	will be what you specified in the control file- you can have costs, durations, counts, etc for each period duration as specified 
+	in the control file. These variables will be created for each agency datasets you specified in the control file.
+	there is potential for some of this code below the line to run in parallel once the grid is up and running */
 /* obtain the SIAL related events and costs within the observation horizon for the population table */
 /* apply inflation adjustments to costs if required. The SIAL tables that will be rolled up depends on */
 /* the configuration in the si_control.sas */
@@ -99,10 +105,38 @@ options obs=MAX mvarsize=max pagesize=132
 
 /* this section calls all the outcome variables - users can add extra macro calls in here for their own */
 /* customised outcome variables */
-%si_get_outcomes_ext;
+/*%si_get_outcomes_ext;*/
 
 
 /* view run statistics such as names of tables, run time etc */
 /* this will help users understand what the SI data foundation has built */
 /* still a work in progress */
 %si_summarise_run(si_summ_proj_schema =&si_proj_schema.);
+
+
+/* PNH: June 2019 : tidy temporary files*/
+%macro clean_up;
+ods output members=members(keep=name);
+proc datasets library=work memtype=data nodetails;
+run;
+quit;
+proc sql;
+	select name 
+	into :delete_members separated by ","
+	from members
+	where name like '%_ALN' or name like '%_DISC';
+quit;
+
+%do i=1 %to %sysfunc(countw(%quote(&delete_members)));
+	%let ds_name=%qscan(%quote(&delete_members),&i,',');
+
+	proc delete data=work.&ds_name;
+%end;
+proc delete data=work.members;
+proc delete data=work.delete_members;
+proc delete data=work.&si_pop_table_out.;
+proc delete data=work.&si_pop_table_out._char;
+
+%mend;
+%clean_up;
+

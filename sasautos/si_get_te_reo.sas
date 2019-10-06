@@ -46,14 +46,14 @@ si_reo_asat_date =, si_reo_table_out =);
 	%put ********************************************************************;
 
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table &si_reo_table_out. as 
 			select * from connection to odbc(
 			select 
 				a.*
 				,1 as te_reo_speaker
 			from [IDI_Sandpit].[&si_reo_proj_schema.].[&si_reo_table_in.] a
-				left join [IDI_Clean].[cen_clean].[census_individual] b
+				left join [&si_reo_dsn].[cen_clean].[census_individual] b
                 on a.&si_reo_id_col = b.&si_reo_id_col
 					/* Maori speaking derived from the official language questions in the census 
 				[IDI_Metadata].[clean_read_CLASSIFICATIONS].[CEN_OFFLANGIN2] 

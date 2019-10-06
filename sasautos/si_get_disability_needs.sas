@@ -23,6 +23,7 @@ been present since birth
 HISTORY:
 14 Jul 2017 WJ v1.1 - changing to innder join rather than left join - commenting out test
 14 Jul 2017 EW v1
+July 2019 PNH - SOCRATES table moved to IDI_Adhoc 
 *********************************************************************************************************/
 %macro si_get_disability_needs(si_din_dsn = IDI_Clean, si_din_proj_schema =, si_din_table_in =, si_din_id_col =, 
 			si_din_table_out =);
@@ -41,7 +42,7 @@ HISTORY:
 	%put ********************************************************************;
 
 	proc sql;
-		connect to odbc(dsn=idi_clean_archive_srvprd);
+		connect to odbc(dsn=&si_idi_dsnname.);
 		create table &si_din_table_out. as 
 			select * from connection to odbc(
 			select distinct a.* 
@@ -49,10 +50,10 @@ HISTORY:
 				/*				,c.code as disability_needs_code */
 				/*				,c.description as disability_needs_desc*/
 			from
-				[IDI_Sandpit].[&si_din_proj_schema.].[&si_din_table_in.] a
+				[IDI_SANDPIT].[&si_din_proj_schema.].[&si_din_table_in.] a
 			left join [&si_din_dsn].[security].[concordance] b
 				on a.&si_din_id_col = b.&si_din_id_col
-			inner join [IDI_Sandpit].[clean_read_MOH_SOCRATES].[moh_support_needs] c
+			inner join [IDI_Adhoc].[clean_read_MOH_SOCRATES].[moh_support_needs] c
 				on b.snz_moh_uid = c.snz_moh_uid
 				);
 		disconnect from odbc;

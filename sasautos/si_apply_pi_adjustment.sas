@@ -29,6 +29,7 @@ DATE: 01 Aug 2016
 KNOWN ISSUES: 
 
 HISTORY: 
+april 2019 PH. SAS Grid updates. (Dates now as sas dates, not strings.
 02 May 2017 VB	Rewrote the code to fit in with the SIAL. Added the functionality to base the inflation
 				adjustment to be read from the database rather than excel files.
 20 Feb 2017	VB	Added CPI, PPI and QEX as dynamic inputs.
@@ -50,16 +51,17 @@ HISTORY:
 	%put ...............Amount Type: &si_amount_type.;
 	%put .............Amount Column: &si_amount_col.;
 
-	
+
 	/* Get the appropriate price index values to which the adjustment needs to be made*/
 	proc sql;
-		create table work._temp_&si_pi_type._values(where=(yq ne '')) as 
+		create table work._temp_&si_pi_type._values /*(where=(yq ne '')) */ as 
 			select 
-				quarter as yq, 
-				value / (select value from sand.inflation_index where inflation_type = "&si_pi_type." and quarter = "&si_ref_quarter.") as adj_&si_pi_type.
+				put(datepart(quarter),yyq6.) as yq, 
+				value / (select value from sand.inflation_index where inflation_type = "&si_pi_type." and put(datepart(quarter),yyq6.) = "&si_ref_quarter.") as adj_&si_pi_type.
 			from 
 			sand.inflation_index
-			where inflation_type = "&si_pi_type." and quarter >= "1925Q3";
+			where inflation_type = "&si_pi_type." and put(datepart(quarter),yyq6.) >= "1925Q3";
+/*			where inflation_type = "&si_pi_type." and quarter >= "1925Q3";  ** SAS-GRID*/
 	quit;
 
 	/* Quarter-ise  the events table. this is the level at which inflation adjustment will be done. */
@@ -69,8 +71,17 @@ HISTORY:
 		set &si_table_in.;
 
 		/* Store the start & end datetimes for the events tables  */
-		event_sdate=start_date;
-		event_edate=end_date;
+		/* Temporarily store the event start & end dates */
+		/* SAS-GRID april 2019 - need to convert to SAS datetime*/
+		/* has to cope with sas_date or date_time*/
+		if length(compress(put(start_date,20.))) < 9 then 
+			event_sdate = dhms(start_date,0,0,0);
+		else event_sdate=start_date;
+
+		if length(compress(put(end_date,20.))) < 9 then 
+			event_edate = dhms(end_date,0,0,0);
+		else event_edate=end_date;
+
 		start_date=.;
 		end_date=.;
 
